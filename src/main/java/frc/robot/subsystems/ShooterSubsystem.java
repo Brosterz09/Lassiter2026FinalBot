@@ -10,13 +10,13 @@ import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel;
 
-public class ExampleSubsystem extends SubsystemBase {
-  /** Creates a new ExampleSubsystem. */
-  public ExampleSubsystem() {}
+public class ShooterSubsystem extends SubsystemBase {
+  /** Creates a new ShooterSubsystem. */
+  public ShooterSubsystem() {}
   TalonFX Motor1 = new TalonFX(15);
   double speed = .3;
   /**
-   * Example command factory method.
+   * Shooter command factory method.
    *
    * @return a command
    */
@@ -51,11 +51,11 @@ public class ExampleSubsystem extends SubsystemBase {
   }
 
   /**
-   * An example method querying a boolean state of the subsystem (for example, a digital sensor).
+   * An Shooter method querying a boolean state of the subsystem (for Shooter, a digital sensor).
    *
    * @return value of some boolean subsystem state, such as a digital sensor.
    */
-  public boolean exampleCondition() {
+  public boolean ShooterCondition() {
     // Query some boolean state, such as a digital sensor.
     return false;
   }
