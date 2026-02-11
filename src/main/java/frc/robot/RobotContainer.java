@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
@@ -37,6 +38,7 @@ public class RobotContainer {
     private final CommandXboxController joystick = new CommandXboxController(0);
     public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
+     public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem();
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
@@ -60,6 +62,8 @@ public class RobotContainer {
         joystick.rightTrigger().whileTrue(m_shooterSubsystem.MoveMotor());
         joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
         joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
+        joystick.povUp().whileTrue(m_IndexSubsystem.RunIndexer());
+        joystick.povDown().whileTrue(m_IndexSubsystem.OtherMotor());
 
 
         // Idle while the robot is disabled. This ensures the configured
