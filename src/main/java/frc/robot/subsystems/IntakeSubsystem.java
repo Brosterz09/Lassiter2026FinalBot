@@ -16,8 +16,8 @@ public class IntakeSubsystem extends SubsystemBase {
   //TalonFX Rotate1 = new TalonFX(14);
   //TalonFX Rotate2 = new TalonFX(15);
   // TalonFX IntakeMotor = new TalonFX(15);
-  SparkMax Rotate = new SparkMax(30, SparkLowLevel.MotorType.kBrushless);
-
+  SparkMax RotateIntakeMotor = new SparkMax(30, SparkLowLevel.MotorType.kBrushless);
+  TalonFX IntakeMotor = new TalonFX(14);
   private boolean reversed = false;
 
   /**
@@ -28,28 +28,30 @@ public class IntakeSubsystem extends SubsystemBase {
   
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    public Command Forwards() {
+    public Command LowerIntakeDOWN() {
     return run(
         () -> {
-            Rotate.set(.55);
-        }).finallyDo(interrupted->Rotate.set(0));
-}
-    public Command Backwards() {
+            RotateIntakeMotor.set(.6);
+        }).finallyDo(interrupted->endMove());
+      }
+
+
+    public Command BringIntakeUP() {
     return run(
         () -> {
-            Rotate.set(-.55);
-        }).finallyDo(interrupted->Rotate.set(0));
-}
+            RotateIntakeMotor.set(-.6);
+        }).finallyDo(interrupted->endMove());
+    }
 
   
-  // public Command RunIntake() {
-  //   return run(
-  //     () -> {
-  //       IntakeMotor.set(.1);
+  public Command RunIntake() {
+    return run(
+      () -> {
+        IntakeMotor.set(.4);
 
-  //     }
-  //   ).finallyDo(interrupted->endMove());
-  // }
+      }
+    ).finallyDo(interrupted->endMove());
+  }
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
@@ -70,7 +72,9 @@ public class IntakeSubsystem extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
-  // public void endMove(){
-  //   IntakeMotor.set(0);
-  // }
+  public void endMove(){
+    IntakeMotor.set(0);
+    RotateIntakeMotor.set(0);
+    
+  }
 }

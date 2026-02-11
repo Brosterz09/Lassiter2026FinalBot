@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.controls.VoltageOut;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
@@ -13,8 +14,10 @@ import com.revrobotics.spark.SparkLowLevel;
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {}
-  TalonFX Motor1 = new TalonFX(15);
-  double speed = .3;
+  TalonFX ShooterMotor = new TalonFX(15);
+  
+  double speed = 12;
+  VoltageOut voltageRequest = new VoltageOut(0.0);
   /**
    * Shooter command factory method.
    *
@@ -25,8 +28,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return run(
         () -> {
-         Motor1.set(-speed);
-
+          ShooterMotor.setControl(new VoltageOut(-speed));
           //continuance action goes here */
         }).finallyDo(interrupted->endMove());
         
@@ -34,18 +36,16 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command raiseSpeed() {
     return runOnce(
         () -> {
-          if (speed < 1) {
-            speed -= .05;
-          }
+            speed += 1;
+          System.out.println("new speed: "+ speed);
         });
   }
 
   public Command lowerSpeed() {
     return runOnce(
         () -> {
-           if (speed > 0) {
-            speed += .05;
-           }         
+            speed -= 1;     
+           System.out.println("new speed: "+ speed);
         });
         
   }
@@ -70,6 +70,9 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
   public void endMove() {
-    Motor1.set(0);
+    ShooterMotor.set(0);
+  }
+  public void setMotorVoltage(double volts) {
+    ShooterMotor.setControl(voltageRequest.withOutput(volts));
   }
 }

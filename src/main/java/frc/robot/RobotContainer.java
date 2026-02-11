@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class RobotContainer {
@@ -35,7 +35,7 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
-    public final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+    public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -54,11 +54,12 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-        joystick.x().onTrue(m_exampleSubsystem.raiseSpeed());
-        joystick.y().onTrue(m_exampleSubsystem.lowerSpeed());
-        joystick.rightTrigger().whileTrue(m_exampleSubsystem.MoveMotor());
-        joystick.a().whileTrue(m_IntakeSubsystem.Forwards());
-        joystick.b().whileTrue(m_IntakeSubsystem.Backwards());
+        joystick.x().onTrue(m_shooterSubsystem.raiseSpeed());
+        joystick.y().onTrue(m_shooterSubsystem.lowerSpeed());
+        joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
+        joystick.rightTrigger().whileTrue(m_shooterSubsystem.MoveMotor());
+        joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
+        joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
 
 
         // Idle while the robot is disabled. This ensures the configured
