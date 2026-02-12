@@ -63,7 +63,6 @@ public class RobotContainer {
         joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
         joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
         joystick.povUp().whileTrue(m_IndexSubsystem.RunIndexer());
-        joystick.povDown().whileTrue(m_IndexSubsystem.OtherMotor());
 
 
         // Idle while the robot is disabled. This ensures the configured

@@ -11,9 +11,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel;
 
 public class IndexSubsystem extends SubsystemBase {
-  TalonFX Indexer = new TalonFX(16);
-  TalonFX OtherMotor = new TalonFX(17);
-  /** Creates a new ExampleSubsystem. */
+  TalonFX Indexer = new TalonFX(17);
+
+
   public IndexSubsystem() {}
 
   public Command RunIndexer() {
@@ -23,14 +23,6 @@ public class IndexSubsystem extends SubsystemBase {
             Indexer.set(.5);
          }
     ).finallyDo(interrupted->Indexer.set(0));
-}
-   public Command OtherMotor() {
-    return run(
-        () -> {
-            
-            OtherMotor.set(.5);
-         }
-    ).finallyDo(interrupted->OtherMotor.set(0));
 }
 
   /**

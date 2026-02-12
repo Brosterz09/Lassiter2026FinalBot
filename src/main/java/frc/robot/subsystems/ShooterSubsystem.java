@@ -14,7 +14,7 @@ import com.revrobotics.spark.SparkLowLevel;
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ShooterSubsystem. */
   public ShooterSubsystem() {}
-  TalonFX ShooterMotor = new TalonFX(15);
+  TalonFX ShooterMotor = new TalonFX(16);
   
   double speed = 12;
   VoltageOut voltageRequest = new VoltageOut(0.0);
@@ -36,7 +36,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command raiseSpeed() {
     return runOnce(
         () -> {
-            speed += 1;
+            speed += .5;
           System.out.println("new speed: "+ speed);
         });
   }
@@ -44,7 +44,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command lowerSpeed() {
     return runOnce(
         () -> {
-            speed -= 1;     
+            speed -= .5;     
            System.out.println("new speed: "+ speed);
         });
         

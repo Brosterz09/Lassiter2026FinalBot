@@ -6,18 +6,18 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+
 
 public class IntakeSubsystem extends SubsystemBase {
+  
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {}
-  //TalonFX Rotate1 = new TalonFX(14);
-  //TalonFX Rotate2 = new TalonFX(15);
-  // TalonFX IntakeMotor = new TalonFX(15);
-  SparkMax RotateIntakeMotor = new SparkMax(30, SparkLowLevel.MotorType.kBrushless);
-  TalonFX IntakeMotor = new TalonFX(14);
+
+    TalonFX IntakeLEVERMotor = new TalonFX(15);
+    TalonFX IntakeMotor = new TalonFX(14);
+
   private boolean reversed = false;
 
   /**
@@ -31,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command LowerIntakeDOWN() {
     return run(
         () -> {
-            RotateIntakeMotor.set(.6);
+            IntakeLEVERMotor.set(.6);
         }).finallyDo(interrupted->endMove());
       }
 
@@ -39,7 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command BringIntakeUP() {
     return run(
         () -> {
-            RotateIntakeMotor.set(-.6);
+            IntakeLEVERMotor.set(-.6);
         }).finallyDo(interrupted->endMove());
     }
 
@@ -74,7 +74,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
   public void endMove(){
     IntakeMotor.set(0);
-    RotateIntakeMotor.set(0);
+    IntakeLEVERMotor.set(0);
     
   }
 }
