@@ -15,7 +15,7 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {}
 
-    TalonFX IntakeLEVERMotor = new TalonFX(15);
+    TalonFX IntakeLEVERMotor = new TalonFX(25);
     TalonFX IntakeMotor = new TalonFX(14);
 
   private boolean reversed = false;
@@ -31,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command LowerIntakeDOWN() {
     return run(
         () -> {
-            IntakeLEVERMotor.set(.6);
+            IntakeLEVERMotor.set(.5);
         }).finallyDo(interrupted->endMove());
       }
 
@@ -39,7 +39,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command BringIntakeUP() {
     return run(
         () -> {
-            IntakeLEVERMotor.set(-.6);
+            IntakeLEVERMotor.set(-.5);
         }).finallyDo(interrupted->endMove());
     }
 

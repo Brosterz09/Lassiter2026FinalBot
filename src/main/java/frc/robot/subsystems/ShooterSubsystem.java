@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel;
+import java.util.Timer;
 
 public class ShooterSubsystem extends SubsystemBase {
   /** Creates a new ShooterSubsystem. */
@@ -23,7 +24,7 @@ public class ShooterSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command MoveMotor() {
+  public Command MoveShooter() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return run(
@@ -49,6 +50,15 @@ public class ShooterSubsystem extends SubsystemBase {
         });
         
   }
+  public Command visionMovementCommand() {
+    // Inline construction of command goes here.
+    // Subsystem::RunOnce implidcitly requires `this` subsystem.
+    return runOnce(
+        () -> {
+          ShooterMotor.setControl(new VoltageOut(-speed));
+          //continuance action goes here */
+        });
+      }
 
   /**
    * An Shooter method querying a boolean state of the subsystem (for Shooter, a digital sensor).

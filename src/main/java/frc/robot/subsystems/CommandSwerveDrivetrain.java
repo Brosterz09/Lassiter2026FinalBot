@@ -10,6 +10,7 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,8 +24,12 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.RobotContainer;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -34,6 +39,7 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
+    private Timer VisionTimer = new Timer();
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -44,6 +50,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
+
+   
+    
 
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
@@ -300,4 +309,45 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
-}
+
+        public Command CenterBot(SwerveRequest.FieldCentric drive, double maxAngularRate) {
+            return run(() -> {             
+                    LimelightHelpers.setPriorityTagID("limelight-front", 9);
+                    double Tx = LimelightHelpers.getTX("limelight-front");
+                    System.out.println(LimelightHelpers.getFiducialID("limelight-front"));
+                    double rotateSpeed = 0.45;
+                    if (Tx > 0) {
+                        rotateSpeed = -rotateSpeed;
+                    }
+                    else if (Tx == 0) {
+                        rotateSpeed = 0;
+                    }
+                    this.setControl(drive.withRotationalRate(rotateSpeed * maxAngularRate));
+
+            }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
+        }
+    }
+    // public Command CenterBot(SwerveRequest.FieldCentric drive, double maxAngularRate) {
+    //         return run(() -> {
+    //             LimelightHelpers.setPipelineIndex("limelight-front", 0);
+    //             int TagID = (int) LimelightHelpers.getFiducialID("limelight-front");
+    //             System.out.println(TagID);
+                
+    //             if (allowedTags.contains((int) TagID)) {
+    //                 LimelightHelpers.setPriorityTagID("limelight-front", TagID);
+    //                 double Tx = LimelightHelpers.getTX("limelight-front");
+    //                 double rotateSpeed = 0.3;
+    //                 System.out.println(Tx);
+    //                 System.out.println(LimelightHelpers.getFiducialID("limelight-front"));
+    //                 if (Tx > 0) {
+    //                     rotateSpeed = -rotateSpeed;
+    //                 }
+    //                 else if (Tx == 0) {
+    //                     rotateSpeed = 0;
+    //                 }
+    //                 this.setControl(drive.withRotationalRate(rotateSpeed * maxAngularRate));
+    //                 }
+    //         }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
+    //     }
+    // }
+
