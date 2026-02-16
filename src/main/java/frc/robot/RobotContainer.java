@@ -9,6 +9,8 @@ import static edu.wpi.first.units.Units.*;
 import java.util.ArrayList;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -37,13 +39,23 @@ public class RobotContainer {
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
+
+
     private final CommandXboxController joystick = new CommandXboxController(0);
     public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
     public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem();
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+
     public RobotContainer() {
+        NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoMoveShooter());
+        NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
+        NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
+        NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
+        
+        drivetrain.configureAutoBuilder();
+    //  NamedCommands.registerCommand("Hang", m_hangSubsystem.HangUp());
         configureBindings();
     }
 
@@ -94,21 +106,15 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        // Simple drive forward auton
-        final var idle = new SwerveRequest.Idle();
-        return Commands.sequence(
-            // Reset our field centric heading to match the robot
-            // facing away from our alliance station wall (0 deg).
-            drivetrain.runOnce(() -> drivetrain.seedFieldCentric(Rotation2d.kZero)),
-            // Then slowly drive forward (away from us) for 5 seconds.
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(0.5)
-                    .withVelocityY(0)
-                    .withRotationalRate(0)
-            )
-            .withTimeout(5.0),
-            // Finally idle for the rest of auton
-            drivetrain.applyRequest(() -> idle)
-        );
+    try {
+        System.out.println("Building auto...");
+        var auto = AutoBuilder.buildAuto("PrimeAuto");
+        System.out.println("Auto built successfully");
+        return auto;
+    } catch (Exception e) {
+        System.out.println("AUTO BUILD ERROR: " + e.getMessage());
+        e.printStackTrace();
+        return Commands.none();
     }
+}
 }

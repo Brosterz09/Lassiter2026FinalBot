@@ -6,6 +6,8 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -28,15 +30,14 @@ public class IntakeSubsystem extends SubsystemBase {
   
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    public Command LowerIntakeDOWN() {
+  public Command LowerIntakeDOWN() {
     return run(
         () -> {
             IntakeLEVERMotor.set(.5);
         }).finallyDo(interrupted->endMove());
       }
 
-
-    public Command BringIntakeUP() {
+  public Command BringIntakeUP() {
     return run(
         () -> {
             IntakeLEVERMotor.set(-.5);
@@ -52,6 +53,27 @@ public class IntakeSubsystem extends SubsystemBase {
       }
     ).finallyDo(interrupted->endMove());
   }
+
+  public Command AutoRunIntake() {
+    return runEnd(
+        () -> IntakeMotor.set(.4),
+        () -> endMove()
+        ).withTimeout(3.5);
+      }
+
+  public Command AutoBringIntakeUP() {
+    return runEnd(
+        () -> IntakeLEVERMotor.set(-.5),
+        () -> endMove()
+        ).withTimeout(.6);
+    }
+
+  public Command AutoLowerIntakeDOWN() {
+    return runEnd(
+        () -> IntakeLEVERMotor.set(.5),
+        () -> endMove()
+        ).withTimeout(.6);
+      }
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).

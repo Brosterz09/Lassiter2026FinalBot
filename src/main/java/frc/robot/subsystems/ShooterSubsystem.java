@@ -25,15 +25,19 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return a command
    */
   public Command MoveShooter() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
     return run(
         () -> {
           ShooterMotor.setControl(new VoltageOut(-speed));
-          //continuance action goes here */
         }).finallyDo(interrupted->endMove());
-        
   }
+
+  public Command AutoMoveShooter() {
+    return runEnd(
+        () -> ShooterMotor.setControl(new VoltageOut(-speed)),
+        () -> endMove()
+        ).withTimeout(3.5);
+      };
+
   public Command raiseSpeed() {
     return runOnce(
         () -> {
