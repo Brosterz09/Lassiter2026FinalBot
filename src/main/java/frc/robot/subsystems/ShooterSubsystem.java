@@ -54,15 +54,6 @@ public class ShooterSubsystem extends SubsystemBase {
         });
         
   }
-  public Command visionMovementCommand() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implidcitly requires `this` subsystem.
-    return runOnce(
-        () -> {
-          ShooterMotor.setControl(new VoltageOut(-speed));
-          //continuance action goes here */
-        });
-      }
 
   /**
    * An Shooter method querying a boolean state of the subsystem (for Shooter, a digital sensor).

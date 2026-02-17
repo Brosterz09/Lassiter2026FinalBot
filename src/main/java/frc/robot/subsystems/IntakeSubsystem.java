@@ -58,7 +58,7 @@ public class IntakeSubsystem extends SubsystemBase {
     return runEnd(
         () -> IntakeMotor.set(.4),
         () -> endMove()
-        ).withTimeout(3.5);
+        ).withTimeout(5);
       }
 
   public Command AutoBringIntakeUP() {

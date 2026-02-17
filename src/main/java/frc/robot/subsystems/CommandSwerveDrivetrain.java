@@ -34,7 +34,8 @@ import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.RobotContainer;
 import java.util.ArrayList;
 import java.util.List;
-
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -283,6 +284,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+        updateVisionFromCamera("limelight-front");
+        updateVisionFromCamera("limelight-back");
     }
 
     private void startSimThread() {
@@ -345,23 +348,43 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
-        public Command CenterBot(SwerveRequest.FieldCentric drive, double maxAngularRate) {
-            return run(() -> {             
-                    LimelightHelpers.setPriorityTagID("limelight-front", 9);
-                    double Tx = LimelightHelpers.getTX("limelight-front");
-                    System.out.println(LimelightHelpers.getFiducialID("limelight-front"));
-                    double rotateSpeed = 0.45;
-                    if (Tx > 0) {
-                        rotateSpeed = -rotateSpeed;
-                    }
-                    else if (Tx == 0) {
-                        rotateSpeed = 0;
-                    }
-                    this.setControl(drive.withRotationalRate(rotateSpeed * maxAngularRate));
+        // public Command CenterBot(SwerveRequest.FieldCentric drive, double maxAngularRate) {
+        //     return run(() -> {             
+        //             LimelightHelpers.setPriorityTagID("limelight-front", 9);
+        //             double Tx = LimelightHelpers.getTX("limelight-front");
+        //             System.out.println(LimelightHelpers.getFiducialID("limelight-front"));
+        //             double rotateSpeed = 0.45;
+        //             if (Tx > 0) {
+        //                 rotateSpeed = -rotateSpeed;
+        //             }
+        //             else if (Tx == 0) {
+        //                 rotateSpeed = 0;
+        //             }
+        //             this.setControl(drive.withRotationalRate(rotateSpeed * maxAngularRate));
 
-            }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
+        //     }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
+        // }
+    private void updateVisionFromCamera(String cameraName) {
+        boolean valid = LimelightHelpers.getTV(cameraName);
+
+        if (valid) {
+            Pose2d botpose = LimelightHelpers.getBotPose2d_wpiBlue(cameraName);
+            double timestamp = LimelightHelpers.getLatency_Pipeline(cameraName) / 1000.0
+                            + LimelightHelpers.getLatency_Capture(cameraName) / 1000.0;
+            double latencyAdjustedTimestamp = Timer.getFPGATimestamp() - timestamp;
+
+            int tagCount = LimelightHelpers.getTargetCount(cameraName);
+
+        if (tagCount >= 2) {
+            addVisionMeasurement(botpose, latencyAdjustedTimestamp,
+                VecBuilder.fill(0.5, 0.5, 0.7));
+            } else if (tagCount == 1) {
+            addVisionMeasurement(botpose, latencyAdjustedTimestamp,
+                VecBuilder.fill(1.0, 1.0, 1.5));
+            }
         }
     }
+}
     // public Command CenterBot(SwerveRequest.FieldCentric drive, double maxAngularRate) {
     //         return run(() -> {
     //             LimelightHelpers.setPipelineIndex("limelight-front", 0);

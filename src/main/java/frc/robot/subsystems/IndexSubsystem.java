@@ -16,14 +16,21 @@ public class IndexSubsystem extends SubsystemBase {
 
   public IndexSubsystem() {}
 
-  public Command RunIndexer() {
+  
+  public Command RunSpindexer() {
     return run(
         () -> {
-            
             Indexer.set(.5);
          }
     ).finallyDo(interrupted->Indexer.set(0));
 }
+  public Command AutoRunSpindexer() {
+    return runEnd(
+        () -> Indexer.set(.5),
+        () -> Indexer.set(0)
+    ).withTimeout(3.5);
+  }
+  
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).

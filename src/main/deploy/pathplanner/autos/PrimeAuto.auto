@@ -5,15 +5,28 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "Shoot"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "MoveIntakeDOWN"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Spindex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "MoveIntakeDOWN"
+                }
+              }
+            ]
           }
         },
         {
@@ -36,9 +49,15 @@
           }
         },
         {
-          "type": "sequential",
+          "type": "parallel",
           "data": {
             "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Spindex"
+                }
+              },
               {
                 "type": "named",
                 "data": {

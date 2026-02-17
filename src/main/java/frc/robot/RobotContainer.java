@@ -50,10 +50,21 @@ public class RobotContainer {
 
     public RobotContainer() {
         NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoMoveShooter());
+        NamedCommands.registerCommand("Spindex", m_IndexSubsystem.AutoRunSpindexer());
         NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
         NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
         NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
         
+    //     LimelightHelpers.setCameraPose_RobotSpace(
+    // "limelight-front",
+    // 0.3, 0.0, 0.25,
+    // 0.0, 15.0, 0.0
+    //     );
+    //     LimelightHelpers.setCameraPose_RobotSpace(
+    // "limelight-back",
+    // -0.3, 0.0, 0.25,
+    // 0.0, 15.0, 180.0
+    //     );
         drivetrain.configureAutoBuilder();
     //  NamedCommands.registerCommand("Hang", m_hangSubsystem.HangUp());
         configureBindings();
@@ -76,8 +87,8 @@ public class RobotContainer {
         joystick.rightTrigger().whileTrue(m_shooterSubsystem.MoveShooter());
         joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
         joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
-        joystick.povUp().whileTrue(m_IndexSubsystem.RunIndexer());
-        joystick.rightBumper().onTrue(drivetrain.CenterBot(drive, MaxAngularRate));
+        joystick.rightBumper().whileTrue(m_IndexSubsystem.RunSpindexer());
+        // joystick.rightBumper().onTrue(drivetrain.CenterBot(drive, MaxAngularRate));
 
 
         // Idle while the robot is disabled. This ensures the configured
@@ -106,15 +117,11 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-    try {
-        System.out.println("Building auto...");
-        var auto = AutoBuilder.buildAuto("PrimeAuto");
-        System.out.println("Auto built successfully");
-        return auto;
-    } catch (Exception e) {
-        System.out.println("AUTO BUILD ERROR: " + e.getMessage());
-        e.printStackTrace();
-        return Commands.none();
+        return AutoBuilder.buildAuto("PrimeAuto");
+        //Other Testing Autos
+        // return AutoBuilder.buildAuto("PrimeAuto"); 
+        // return AutoBuilder.buildAuto("PrimeAuto");
+        // return AutoBuilder.buildAuto("PrimeAuto");
     }
 }
-}
+
