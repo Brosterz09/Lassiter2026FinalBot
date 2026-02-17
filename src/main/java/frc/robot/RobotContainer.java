@@ -13,6 +13,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -117,7 +118,25 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return AutoBuilder.buildAuto("PrimeAuto");
+        return Commands.sequence(
+        // Step 1: Wait briefly for vision to get a good read
+        Commands.waitSeconds(.4),
+
+        // Step 2: Reset pose to whatever vision sees
+        Commands.runOnce(() -> {
+            if (LimelightHelpers.getTV("limelight-front")) {
+                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
+                drivetrain.resetPose(visionPose);
+                System.out.println("Pose reset to: " + visionPose);
+            } else if (LimelightHelpers.getTV("limelight-back")) {
+                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
+                drivetrain.resetPose(visionPose);
+                System.out.println("Pose reset from back camera: " + visionPose);
+            } else {
+                System.out.println("WARNING: No vision targets seen, using odometry pose");
+            }
+        }),
+        AutoBuilder.buildAuto("PrimeAuto"));
         //Other Testing Autos
         // return AutoBuilder.buildAuto("PrimeAuto"); 
         // return AutoBuilder.buildAuto("PrimeAuto");
