@@ -5,6 +5,10 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.VoltageOut;
+
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
@@ -12,9 +16,20 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel;
 import java.util.Timer;
 
+import java.util.function.Supplier;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Translation2d;
+
 public class ShooterSubsystem extends SubsystemBase {
-  /** Creates a new ShooterSubsystem. */
-  public ShooterSubsystem() {}
+  private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
+
+  public ShooterSubsystem() {
+    shooterSpeedMap.put(1.0, 6.8);   
+    shooterSpeedMap.put(2.0, 7.6);
+    shooterSpeedMap.put(3.0, 8.4);
+    shooterSpeedMap.put(4.0, 10.0);
+    shooterSpeedMap.put(5.0, 12.0);  
+  }
   TalonFX ShooterMotor = new TalonFX(16);
   
   double speed = 12;
@@ -24,19 +39,32 @@ public class ShooterSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public Command MoveShooter() {
-    return run(
-        () -> {
-          ShooterMotor.setControl(new VoltageOut(-speed));
-        }).finallyDo(interrupted->endMove());
-  }
+  public Command MoveShooterWithDistance(Supplier<Pose2d> poseSupplier) {
+    Translation2d blueHub = new Translation2d(4.6, 4.0);
+    Translation2d redHub = new Translation2d(11.9, 4.0);
+    return run(() -> {
+        Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            ? blueHub : redHub;
+        double distance = poseSupplier.get().getTranslation().getDistance(hub);
+        double voltage = shooterSpeedMap.get(distance);
+        ShooterMotor.setControl(new VoltageOut(-voltage));
+    }).finallyDo(interrupted -> endMove());
+}
 
-  public Command AutoMoveShooter() {
+  public Command AutoMoveShooter(Supplier<Pose2d> poseSupplier) {
+    Translation2d blueHubPosition = new Translation2d(4.6, 4.0);
+    Translation2d redHubPosition = new Translation2d(11.9,4.0);
     return runEnd(
-        () -> ShooterMotor.setControl(new VoltageOut(-speed)),
+        () -> {
+            Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? blueHubPosition : redHubPosition;
+            double distance = poseSupplier.get().getTranslation().getDistance(hub);
+            getSpeedForDistance(distance);
+            ShooterMotor.setControl(new VoltageOut(-speed));
+        },
         () -> endMove()
-        ).withTimeout(3.5);
-      };
+    ).withTimeout(4.0);
+}
 
   public Command raiseSpeed() {
     return runOnce(
@@ -53,6 +81,10 @@ public class ShooterSubsystem extends SubsystemBase {
            System.out.println("new speed: "+ speed);
         });
         
+  }
+
+  public void getSpeedForDistance(double distanceMeters) {
+    speed =  shooterSpeedMap.get(distanceMeters);
   }
 
   /**

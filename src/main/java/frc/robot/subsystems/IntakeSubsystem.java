@@ -34,44 +34,43 @@ public class IntakeSubsystem extends SubsystemBase {
     return run(
         () -> {
             IntakeLEVERMotor.set(.5);
-        }).finallyDo(interrupted->endMove());
+        }).finallyDo(interrupted->endLeverMove());
       }
 
   public Command BringIntakeUP() {
     return run(
         () -> {
             IntakeLEVERMotor.set(-.5);
-        }).finallyDo(interrupted->endMove());
+        }).finallyDo(interrupted->endLeverMove());
     }
 
-  
   public Command RunIntake() {
     return run(
       () -> {
         IntakeMotor.set(.4);
 
       }
-    ).finallyDo(interrupted->endMove());
+    ).finallyDo(interrupted->endIntakeMove());
   }
 
   public Command AutoRunIntake() {
     return runEnd(
         () -> IntakeMotor.set(.4),
-        () -> endMove()
+        () -> endIntakeMove()
         ).withTimeout(5);
       }
 
   public Command AutoBringIntakeUP() {
     return runEnd(
         () -> IntakeLEVERMotor.set(-.5),
-        () -> endMove()
+        () -> endLeverMove()
         ).withTimeout(.6);
     }
 
   public Command AutoLowerIntakeDOWN() {
     return runEnd(
         () -> IntakeLEVERMotor.set(.5),
-        () -> endMove()
+        () -> endLeverMove()
         ).withTimeout(.6);
       }
 
@@ -94,9 +93,11 @@ public class IntakeSubsystem extends SubsystemBase {
   public void simulationPeriodic() {
     // This method will be called once per scheduler run during simulation
   }
-  public void endMove(){
-    IntakeMotor.set(0);
+  public void endLeverMove(){
     IntakeLEVERMotor.set(0);
-    
+  }
+
+  public void endIntakeMove() {
+    IntakeMotor.set(0);
   }
 }

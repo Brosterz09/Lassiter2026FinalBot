@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -384,28 +385,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             }
         }
     }
-}
-    // public Command CenterBot(SwerveRequest.FieldCentric drive, double maxAngularRate) {
-    //         return run(() -> {
-    //             LimelightHelpers.setPipelineIndex("limelight-front", 0);
-    //             int TagID = (int) LimelightHelpers.getFiducialID("limelight-front");
-    //             System.out.println(TagID);
-                
-    //             if (allowedTags.contains((int) TagID)) {
-    //                 LimelightHelpers.setPriorityTagID("limelight-front", TagID);
-    //                 double Tx = LimelightHelpers.getTX("limelight-front");
-    //                 double rotateSpeed = 0.3;
-    //                 System.out.println(Tx);
-    //                 System.out.println(LimelightHelpers.getFiducialID("limelight-front"));
-    //                 if (Tx > 0) {
-    //                     rotateSpeed = -rotateSpeed;
-    //                 }
-    //                 else if (Tx == 0) {
-    //                     rotateSpeed = 0;
-    //                 }
-    //                 this.setControl(drive.withRotationalRate(rotateSpeed * maxAngularRate));
-    //                 }
-    //         }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
-    //     }
-    // }
+    public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
+    Translation2d blueHub = new Translation2d(4.6, 4.0);
+    Translation2d redHub = new Translation2d(11.9, 4.0);
 
+    return run(() -> {
+        Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            ? blueHub : redHub;
+
+        Pose2d currentPose = getState().Pose;
+        Translation2d toHub = hub.minus(currentPose.getTranslation());
+        Rotation2d targetAngle = toHub.getAngle();
+
+        double error = targetAngle.minus(currentPose.getRotation()).getRadians();
+
+        double kP = 5.0; 
+        double rotationSpeed = error * kP;
+
+        rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
+
+        setControl(drive
+            .withVelocityX(vx.get())
+            .withVelocityY(vy.get())
+            .withRotationalRate(rotationSpeed)
+        );
+    });
+}
+}
+    
+    

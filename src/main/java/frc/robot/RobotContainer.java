@@ -50,24 +50,25 @@ public class RobotContainer {
 
 
     public RobotContainer() {
-        NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoMoveShooter());
+        NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoMoveShooter(() -> drivetrain.getState().Pose));
         NamedCommands.registerCommand("Spindex", m_IndexSubsystem.AutoRunSpindexer());
         NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
         NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
         NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
+        //  NamedCommands.registerCommand("Hang", m_hangSubsystem.HangUp());
         
-    //     LimelightHelpers.setCameraPose_RobotSpace(
-    // "limelight-front",
-    // 0.3, 0.0, 0.25,
-    // 0.0, 15.0, 0.0
-    //     );
-    //     LimelightHelpers.setCameraPose_RobotSpace(
-    // "limelight-back",
-    // -0.3, 0.0, 0.25,
-    // 0.0, 15.0, 180.0
-    //     );
+        LimelightHelpers.setCameraPose_RobotSpace(
+    "limelight-front",
+    0.3, 0.0, 0.25,
+    0.0, 15.0, 0.0
+        );
+        LimelightHelpers.setCameraPose_RobotSpace(
+    "limelight-back",
+    -0.3, 0.0, 0.25,
+    0.0, 15.0, 180.0
+        );
         drivetrain.configureAutoBuilder();
-    //  NamedCommands.registerCommand("Hang", m_hangSubsystem.HangUp());
+    
         configureBindings();
     }
 
@@ -85,10 +86,20 @@ public class RobotContainer {
         joystick.x().onTrue(m_shooterSubsystem.raiseSpeed());
         joystick.y().onTrue(m_shooterSubsystem.lowerSpeed());
         joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
-        joystick.rightTrigger().whileTrue(m_shooterSubsystem.MoveShooter());
         joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
         joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
-        joystick.rightBumper().whileTrue(m_IndexSubsystem.RunSpindexer());
+        joystick.rightTrigger().whileTrue(
+            Commands.parallel(
+            drivetrain.aimAtHub(
+            drive,
+            () -> -joystick.getLeftY() * MaxSpeed,
+            () -> -joystick.getLeftX() * MaxSpeed,
+            MaxAngularRate
+        ),
+        m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
+        m_IndexSubsystem.RunSpindexer()
+    )
+);
         // joystick.rightBumper().onTrue(drivetrain.CenterBot(drive, MaxAngularRate));
 
 
