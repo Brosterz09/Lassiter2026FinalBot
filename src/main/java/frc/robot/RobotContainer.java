@@ -128,10 +128,9 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.sequence(
-        // Step 1: Wait briefly for vision to get a good read
+
         Commands.waitSeconds(.4),
 
-        // Step 2: Reset pose to whatever vision sees
         Commands.runOnce(() -> {
             if (LimelightHelpers.getTV("limelight-front")) {
                 Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
@@ -145,11 +144,11 @@ public class RobotContainer {
                 System.out.println("WARNING: No vision targets seen, using odometry pose");
             }
         }),
-        AutoBuilder.buildAuto("PrimeAuto"));
+        AutoBuilder.buildAuto("ExperimentalFinalAuto"));
         //Other Testing Autos
-        // return AutoBuilder.buildAuto("PrimeAuto"); 
-        // return AutoBuilder.buildAuto("PrimeAuto");
-        // return AutoBuilder.buildAuto("PrimeAuto");
+        // AutoBuilder.buildAuto("ExperimentalFinalAuto"); 
+        // AutoBuilder.buildAuto("PrimeAuto");
+        // AutoBuilder.buildAuto("PrimeAuto");
     }
 }
 
