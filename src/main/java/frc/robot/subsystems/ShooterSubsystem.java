@@ -24,11 +24,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
 
   public ShooterSubsystem() {
-    shooterSpeedMap.put(1.0, 6.8);   
-    shooterSpeedMap.put(2.0, 7.6);
-    shooterSpeedMap.put(3.0, 8.4);
-    shooterSpeedMap.put(4.0, 10.0);
-    shooterSpeedMap.put(5.0, 12.0);  
   }
   TalonFX ShooterMotor = new TalonFX(16);
   
@@ -67,8 +62,8 @@ public class ShooterSubsystem extends SubsystemBase {
 }
 
   public void getSpeedForDistance(double distanceMeters) {
-    double KP = .57827842218;
-    speed =  distanceMeters*KP;
+    double KP = .27827842218;
+    speed =  distanceMeters*KP + 1.2;
   }
 
   /**
