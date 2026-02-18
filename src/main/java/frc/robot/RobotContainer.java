@@ -59,12 +59,12 @@ public class RobotContainer {
         
         LimelightHelpers.setCameraPose_RobotSpace(
     "limelight-front",
-    0.3, 0.0, 0.25,
+    0.15748, -0.1353312, 0.35306,
     0.0, 15.0, 0.0
         );
         LimelightHelpers.setCameraPose_RobotSpace(
     "limelight-back",
-    -0.3, 0.0, 0.25,
+    -0.3283458, -0.0896112, 0.17145,
     0.0, 15.0, 180.0
         );
         drivetrain.configureAutoBuilder();
@@ -83,8 +83,6 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-        joystick.x().onTrue(m_shooterSubsystem.raiseSpeed());
-        joystick.y().onTrue(m_shooterSubsystem.lowerSpeed());
         joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
         joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
         joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());

@@ -46,8 +46,8 @@ public class ShooterSubsystem extends SubsystemBase {
         Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
             ? blueHub : redHub;
         double distance = poseSupplier.get().getTranslation().getDistance(hub);
-        double voltage = shooterSpeedMap.get(distance);
-        ShooterMotor.setControl(new VoltageOut(-voltage));
+        getSpeedForDistance(distance);
+        ShooterMotor.setControl(new VoltageOut(-speed));
     }).finallyDo(interrupted -> endMove());
 }
 
@@ -66,25 +66,9 @@ public class ShooterSubsystem extends SubsystemBase {
     ).withTimeout(4.0);
 }
 
-  public Command raiseSpeed() {
-    return runOnce(
-        () -> {
-            speed += .5;
-          System.out.println("new speed: "+ speed);
-        });
-  }
-
-  public Command lowerSpeed() {
-    return runOnce(
-        () -> {
-            speed -= .5;     
-           System.out.println("new speed: "+ speed);
-        });
-        
-  }
-
   public void getSpeedForDistance(double distanceMeters) {
-    speed =  shooterSpeedMap.get(distanceMeters);
+    double KP = .77827842218;
+    speed =  distanceMeters*KP;
   }
 
   /**
