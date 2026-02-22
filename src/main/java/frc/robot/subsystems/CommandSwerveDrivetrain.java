@@ -222,7 +222,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             ),
             new PPHolonomicDriveController(
                 new PIDConstants(10.0, 0.0, 0.0),
-                new PIDConstants(7.0, 0.0, 0.0)
+                new PIDConstants(3.0, 0.0, 0)
             ),
             config,
             () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
@@ -392,21 +392,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     return run(() -> {
         Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
             ? blueHub : redHub;
-
+        System.out.println(hub);
         Pose2d currentPose = getState().Pose;
         Translation2d toHub = hub.minus(currentPose.getTranslation());
         Rotation2d targetAngle = toHub.getAngle();
+        System.out.println(targetAngle);
 
         double error = targetAngle.minus(currentPose.getRotation()).getRadians();
-
-        double kP = 6.7; 
+        System.out.println(error);
+        double kP = 3; 
         double rotationSpeed = error * kP;
 
         rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
 
         setControl(drive
-            .withVelocityX(vx.get())
-            .withVelocityY(vy.get())
+            .withVelocityX(-vx.get())
+            .withVelocityY(-vy.get())
             .withRotationalRate(rotationSpeed)
         );
     });

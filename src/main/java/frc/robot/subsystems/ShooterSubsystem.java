@@ -25,8 +25,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public ShooterSubsystem() {
   }
-  TalonFX ShooterMotor = new TalonFX(16);
-  
+  TalonFX ShooterMotor = new TalonFX(15);
+
   double speed = 12;
   VoltageOut voltageRequest = new VoltageOut(0.0);
   /**
@@ -46,6 +46,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }).finallyDo(interrupted -> endMove());
 }
 
+
   public Command AutoMoveShooter(Supplier<Pose2d> poseSupplier) {
     Translation2d blueHubPosition = new Translation2d(4.6, 4.0);
     Translation2d redHubPosition = new Translation2d(11.9,4.0);
@@ -63,8 +64,15 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void getSpeedForDistance(double distanceMeters) {
     double KP = .27827842218;
-    speed =  distanceMeters*KP + 1.2;
+    speed =  distanceMeters*KP + 1.4;
   }
+
+  public Command JustShoot() {
+    return run(
+        () -> {
+            setMotorVoltage(-12);
+        }).finallyDo(interrupted->endMove());
+      }
 
   /**
    * An Shooter method querying a boolean state of the subsystem (for Shooter, a digital sensor).

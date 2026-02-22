@@ -76,6 +76,12 @@
                 "data": {
                   "pathName": "HangAfterIntake"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Hang"
+                }
               }
             ]
           }

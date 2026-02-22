@@ -30,9 +30,24 @@ public class IntakeSubsystem extends SubsystemBase {
   
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-  public Command LowerIntakeDOWN() {
+  // public Command LowerIntakeDOWN() {
+  //   return run(
+  //       () -> {
+  //           IntakeLEVERMotor.set(.5);
+  //       }).finallyDo(interrupted->endLeverMove());
+  //     }
+
+  // public Command BringIntakeUP() {
+  //   return run(
+  //       () -> {
+  //           IntakeLEVERMotor.set(-.5);
+  //       }).finallyDo(interrupted->endLeverMove());
+  //   }
+
+    public Command LowerIntakeDOWN() {
     return run(
         () -> {
+            // double leverPosition = IntakeLEVERMotor.getPosition().getValueAsDouble();
             IntakeLEVERMotor.set(.5);
         }).finallyDo(interrupted->endLeverMove());
       }

@@ -9,8 +9,10 @@ import static edu.wpi.first.units.Units.*;
 import java.util.ArrayList;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.fasterxml.jackson.databind.util.Named;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.ctre.phoenix6.hardware.jni.HardwareJNI;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -23,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.subsystems.HangSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -46,6 +49,7 @@ public class RobotContainer {
     public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
     public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem();
+    public final HangSubsystem m_HangSubsystem = new HangSubsystem();
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
 
@@ -55,12 +59,13 @@ public class RobotContainer {
         NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
         NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
         NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
+        NamedCommands.registerCommand("Hang", m_HangSubsystem.AutoHangBot());
         //  NamedCommands.registerCommand("Hang", m_hangSubsystem.HangUp());
         
         LimelightHelpers.setCameraPose_RobotSpace(
     "limelight-front",
     0.15748, -0.1353312, 0.35306,
-    0.0, 15.0, 0.0
+    0.0, 0.0, 0.0
         );
         LimelightHelpers.setCameraPose_RobotSpace(
     "limelight-back",
@@ -84,14 +89,18 @@ public class RobotContainer {
             )
         );
         joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
+        joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
+        joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
         joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
         joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
+        joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
+        joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
         joystick.rightTrigger().whileTrue(
             Commands.parallel(
             drivetrain.aimAtHub(
             drive,
-            () -> -joystick.getLeftY() * MaxSpeed,
-            () -> -joystick.getLeftX() * MaxSpeed,
+            () ->  joystick.getLeftY() * MaxSpeed,
+            () ->  joystick.getLeftX() * MaxSpeed,
             MaxAngularRate
         ),
         m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
