@@ -399,8 +399,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         System.out.println(targetAngle);
 
         double error = targetAngle.minus(currentPose.getRotation()).getRadians();
-        System.out.println(error);
-        double kP = 3; 
+        System.out.println(currentPose.getRotation());
+        double kP = 4; 
         double rotationSpeed = error * kP;
 
         rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));

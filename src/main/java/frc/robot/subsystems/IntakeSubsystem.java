@@ -7,47 +7,49 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
+import com.ctre.phoenix6.controls.PositionVoltage;
 
 public class IntakeSubsystem extends SubsystemBase {
   
   /** Creates a new ExampleSubsystem. */
-  public IntakeSubsystem() {}
+  public IntakeSubsystem() {
+    var config = new TalonFXConfiguration();
+    config.Slot0.kP = 7.0;
+    config.Slot0.kI = 0.0;
+    config.Slot0.kD = 0.1;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    IntakeLEVERMotor.getConfigurator().apply(config);
+    
+    IntakeLEVERMotor.setPosition(0);
+}
 
     TalonFX IntakeLEVERMotor = new TalonFX(25);
     TalonFX IntakeMotor = new TalonFX(14);
 
+  private final PositionVoltage positionRequest = new PositionVoltage(0);
   private boolean reversed = false;
+  private static final double INTAKE_DOWN_POSITION = 5.0;  // CHANGE THIS
+  private static final double INTAKE_UP_POSITION = 0.0;
 
-  /**
-   * Example command factory method.
-   *
-   * @return a command
-   */
-  
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-  // public Command LowerIntakeDOWN() {
-  //   return run(
-  //       () -> {
-  //           IntakeLEVERMotor.set(.5);
-  //       }).finallyDo(interrupted->endLeverMove());
-  //     }
+    public Command GoToDown() {
+      return run(() -> {
+        IntakeLEVERMotor.setControl(positionRequest.withPosition(INTAKE_DOWN_POSITION));
+    }).until(() -> Math.abs(IntakeLEVERMotor.getPosition().getValueAsDouble() - INTAKE_DOWN_POSITION) < 0.5); 
+  }
 
-  // public Command BringIntakeUP() {
-  //   return run(
-  //       () -> {
-  //           IntakeLEVERMotor.set(-.5);
-  //       }).finallyDo(interrupted->endLeverMove());
-  //   }
+    public Command GoToUp() {
+      return run(() -> {
+        IntakeLEVERMotor.setControl(positionRequest.withPosition(INTAKE_UP_POSITION));
+    }).until(() -> Math.abs(IntakeLEVERMotor.getPosition().getValueAsDouble() - INTAKE_UP_POSITION) < 0.5);
+}
 
     public Command LowerIntakeDOWN() {
     return run(
         () -> {
-            // double leverPosition = IntakeLEVERMotor.getPosition().getValueAsDouble();
             IntakeLEVERMotor.set(.5);
         }).finallyDo(interrupted->endLeverMove());
       }
@@ -68,6 +70,7 @@ public class IntakeSubsystem extends SubsystemBase {
     ).finallyDo(interrupted->endIntakeMove());
   }
 
+  //   AUTO COMMANDS -----------------------------------------
   public Command AutoRunIntake() {
     return runEnd(
         () -> IntakeMotor.set(.4),
@@ -88,6 +91,8 @@ public class IntakeSubsystem extends SubsystemBase {
         () -> endLeverMove()
         ).withTimeout(.6);
       }
+
+  
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).

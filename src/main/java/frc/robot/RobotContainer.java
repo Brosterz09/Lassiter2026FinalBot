@@ -83,24 +83,24 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed * .6) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed * .6) // Drive left with negative X (left)
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
         joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
-        joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
-        joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
+        joystick.a().onTrue(m_IntakeSubsystem.GoToDown());
+        joystick.b().onTrue(m_IntakeSubsystem.GoToUp());
         joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
         joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
         joystick.rightTrigger().whileTrue(
             Commands.parallel(
             drivetrain.aimAtHub(
             drive,
-            () ->  joystick.getLeftY() * MaxSpeed,
-            () ->  joystick.getLeftX() * MaxSpeed,
+            () ->  joystick.getLeftY() * MaxSpeed * .6,
+            () ->  joystick.getLeftX() * MaxSpeed * .6,
             MaxAngularRate
         ),
         m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
