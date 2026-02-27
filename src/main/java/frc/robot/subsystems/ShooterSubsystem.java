@@ -5,6 +5,11 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -14,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkLowLevel;
+
+import java.io.ObjectInputFilter.Config;
 import java.util.Timer;
 
 import java.util.function.Supplier;
@@ -22,11 +29,24 @@ import edu.wpi.first.math.geometry.Translation2d;
 
 public class ShooterSubsystem extends SubsystemBase {
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
-
+  private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   public ShooterSubsystem() {
+  TalonFXConfiguration config = new TalonFXConfiguration();
+  config.Slot0.kP = 0.11;
+  config.Slot0.kI = 0;
+  config.Slot0.kD = 0;
+  config.Slot0.kV = 0.12;
+  config.CurrentLimits.StatorCurrentLimit = 60;
+  config.CurrentLimits.StatorCurrentLimitEnable = true;
+  config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+  config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+  ShooterMotor.getConfigurator().apply(config);
+
   }
   TalonFX ShooterMotor = new TalonFX(15);
-
+  
+  
+  
   double speed = 12;
   VoltageOut voltageRequest = new VoltageOut(0.0);
   /**
@@ -70,9 +90,15 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command JustShoot() {
     return run(
         () -> {
-            setMotorVoltage(-12);
+            setShooterVelocity(2909 );
         }).finallyDo(interrupted->endMove());
       }
+  public void setShooterVelocity(double targetRPS){
+    ShooterMotor.setControl(m_velocity.withVelocity(targetRPS));
+  }
+  public void stop(){
+    ShooterMotor.setControl(new com.ctre.phoenix6.controls.NeutralOut());
+  }
 
   /**
    * An Shooter method querying a boolean state of the subsystem (for Shooter, a digital sensor).
@@ -94,9 +120,10 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
   public void endMove() {
-    ShooterMotor.set(0);
+    stop();
   }
   public void setMotorVoltage(double volts) {
     ShooterMotor.setControl(voltageRequest.withOutput(volts));
   }
 }
+ 
