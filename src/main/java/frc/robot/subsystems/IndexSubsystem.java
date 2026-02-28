@@ -19,45 +19,62 @@ import com.revrobotics.spark.SparkLowLevel;
 
 public class IndexSubsystem extends SubsystemBase {
   TalonFX Indexer = new TalonFX(17);
- private final InterpolatingDoubleTreeMap indexerSpeedMap = new InterpolatingDoubleTreeMap();
+  private final InterpolatingDoubleTreeMap indexerSpeedMap = new InterpolatingDoubleTreeMap();
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
+
+  private final double TARGET_RPS = -40;
+  private double m_targetRPS = TARGET_RPS;
 
   public IndexSubsystem() {
     
     TalonFXConfiguration config = new TalonFXConfiguration();
-  config.Slot0.kP = 0.11;
-  config.Slot0.kI = 0;
-  config.Slot0.kD = 0;
-  config.Slot0.kV = 0.12;
-  config.CurrentLimits.StatorCurrentLimit = 60;
-  config.CurrentLimits.StatorCurrentLimitEnable = true;
-  config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-  config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-  Indexer.getConfigurator().apply(config);
+      config.Slot0.kP = 0.098;
+      config.Slot0.kI = 0;
+      config.Slot0.kD = 0;
+      config.Slot0.kV = 0.098;
+      config.Slot0.kS = 0.0;
+      config.CurrentLimits.StatorCurrentLimit = 60;
+      config.CurrentLimits.StatorCurrentLimitEnable = true;
+      config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+      config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+      Indexer.getConfigurator().apply(config);
   }
 
   
   public Command RunSpindexer() {
     return run(
         () -> {
-            setIndexerVelocity(4000);
+            setIndexerVelocity(m_targetRPS);
          }
     ).finallyDo(interrupted->stop());
-}
+  }
+
   public Command AutoRunSpindexer() {
     return runEnd(
         () -> Indexer.set(.2),
         () -> Indexer.set(0)
     ).withTimeout(3.5);
   }
-   public void setIndexerVelocity(double targetRPS){
+   
+  public void setIndexerVelocity(double targetRPS){
     Indexer.setControl(m_velocity.withVelocity(targetRPS));
   }
+  
   public void stop(){
     Indexer.setControl(new com.ctre.phoenix6.controls.NeutralOut());
   }
 
-  
+  public Command velocityIncrease() {
+    return runOnce(() -> m_targetRPS *= 1.1);
+  }
+
+  public Command velocityDecrease() {
+    return runOnce(() -> m_targetRPS /= 1.1);
+  }
+
+  public Command velocityReset() {
+    return runOnce(() -> m_targetRPS = TARGET_RPS);
+  }
 
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).

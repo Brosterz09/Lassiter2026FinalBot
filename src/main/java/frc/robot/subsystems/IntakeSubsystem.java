@@ -7,20 +7,51 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 
 public class IntakeSubsystem extends SubsystemBase {
   
+  TalonFX IntakeArmMotor = new TalonFX(25);
+  TalonFX IntakeMotor = new TalonFX(14);
+
+  private boolean reversed = true;
+
+  private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
+  private final PositionVoltage m_positionArm = new PositionVoltage(0);
+
   /** Creates a new ExampleSubsystem. */
-  public IntakeSubsystem() {}
+  public IntakeSubsystem() {
+      TalonFXConfiguration config = new TalonFXConfiguration();
+      config.Slot0.kP = 0.098;
+      config.Slot0.kI = 0;
+      config.Slot0.kD = 0;
+      config.Slot0.kV = 0.098;
+      config.Slot0.kS = 0.0;
+      config.CurrentLimits.StatorCurrentLimit = 60;
+      config.CurrentLimits.StatorCurrentLimitEnable = true;
+      config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+      config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+      IntakeMotor.getConfigurator().apply(config);
 
-    TalonFX IntakeLEVERMotor = new TalonFX(25);
-    TalonFX IntakeMotor = new TalonFX(14);
-
-  private boolean reversed = false;
+      TalonFXConfiguration armConfig = new TalonFXConfiguration();
+      config.Slot0.kP = 0.098;
+      config.Slot0.kI = 0;
+      config.Slot0.kD = 0;
+      config.Slot0.kV = 0.098;
+      config.Slot0.kS = 0.0;
+      config.CurrentLimits.StatorCurrentLimit = 60;
+      config.CurrentLimits.StatorCurrentLimitEnable = true;
+      config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+      config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+      IntakeArmMotor.getConfigurator().apply(armConfig);
+  }
 
   /**
    * Example command factory method.
@@ -33,37 +64,45 @@ public class IntakeSubsystem extends SubsystemBase {
   // public Command LowerIntakeDOWN() {
   //   return run(
   //       () -> {
-  //           IntakeLEVERMotor.set(.5);
+  //           IntakeArmMotor.set(.5);
   //       }).finallyDo(interrupted->endLeverMove());
   //     }
 
   // public Command BringIntakeUP() {
   //   return run(
   //       () -> {
-  //           IntakeLEVERMotor.set(-.5);
+  //           IntakeArmMotor.set(-.5);
   //       }).finallyDo(interrupted->endLeverMove());
   //   }
 
-    public Command LowerIntakeDOWN() {
+    public void setIntakeVelocity(double targetRPS){
+      IntakeMotor.setControl(m_velocityIntake.withVelocity(targetRPS));
+    }
+  
+    public void stopIntake(){
+      IntakeMotor.setControl(new com.ctre.phoenix6.controls.NeutralOut());
+    }
+
+
+    public Command IntakeArmDown() {
     return run(
         () -> {
-            // double leverPosition = IntakeLEVERMotor.getPosition().getValueAsDouble();
-            IntakeLEVERMotor.set(.5);
+            // double leverPosition = IntakeArmMotor.getPosition().getValueAsDouble();
+            IntakeArmMotor.set(.5);
         }).finallyDo(interrupted->endLeverMove());
       }
 
-  public Command BringIntakeUP() {
+  public Command IntakeArmUp() {
     return run(
         () -> {
-            IntakeLEVERMotor.set(-.5);
+            IntakeArmMotor.set(-.5);
         }).finallyDo(interrupted->endLeverMove());
     }
 
   public Command RunIntake() {
     return run(
       () -> {
-        IntakeMotor.set(.4);
-
+        setIntakeVelocity(40);
       }
     ).finallyDo(interrupted->endIntakeMove());
   }
@@ -77,14 +116,14 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoBringIntakeUP() {
     return runEnd(
-        () -> IntakeLEVERMotor.set(-.5),
+        () -> IntakeArmMotor.set(-.5),
         () -> endLeverMove()
         ).withTimeout(.6);
     }
 
   public Command AutoLowerIntakeDOWN() {
     return runEnd(
-        () -> IntakeLEVERMotor.set(.5),
+        () -> IntakeArmMotor.set(.5),
         () -> endLeverMove()
         ).withTimeout(.6);
       }
@@ -109,7 +148,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
   public void endLeverMove(){
-    IntakeLEVERMotor.set(0);
+    IntakeArmMotor.set(0);
   }
 
   public void endIntakeMove() {

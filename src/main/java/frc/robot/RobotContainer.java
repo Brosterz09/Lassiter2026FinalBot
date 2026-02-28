@@ -46,6 +46,7 @@ public class RobotContainer {
 
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController joystick2 = new CommandXboxController(1);
     public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
     public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem();
@@ -89,24 +90,31 @@ public class RobotContainer {
             )
         );
         joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
+        joystick.leftBumper().whileTrue(m_shooterSubsystem.ReverseShooter());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
-        joystick.a().whileTrue(m_IntakeSubsystem.LowerIntakeDOWN());
-        joystick.b().whileTrue(m_IntakeSubsystem.BringIntakeUP());
+        //joystick.a().whileTrue(m_IntakeSubsystem.IntakeArmDown());
+        //joystick.b().whileTrue(m_IntakeSubsystem.IntakeArmUp());
         joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
         joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
         joystick.rightTrigger().whileTrue(
             Commands.parallel(
-            drivetrain.aimAtHub(
-            drive,
-            () ->  joystick.getLeftY() * MaxSpeed,
-            () ->  joystick.getLeftX() * MaxSpeed,
-            MaxAngularRate
-        ),
-        m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
-        m_IndexSubsystem.RunSpindexer()
-    )
-);
+                drivetrain.aimAtHub(
+                    drive,
+                    () ->  joystick.getLeftY() * MaxSpeed,
+                    () ->  joystick.getLeftX() * MaxSpeed,
+                    MaxAngularRate
+                ),
+                m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
+                m_IndexSubsystem.RunSpindexer()
+            )
+        );
+        joystick2.x().onTrue(m_shooterSubsystem.velocityIncrease());
+        joystick2.y().onTrue(m_shooterSubsystem.velocityDecrease());
+        joystick2.a().onTrue(m_IndexSubsystem.velocityIncrease());
+        joystick2.b().onTrue(m_IndexSubsystem.velocityDecrease());
+        joystick2.leftBumper().onTrue(m_shooterSubsystem.velocityReset());
+        joystick2.rightBumper().onTrue(m_IndexSubsystem.velocityReset());
         // joystick.rightBumper().onTrue(drivetrain.CenterBot(drive, MaxAngularRate));
 
 

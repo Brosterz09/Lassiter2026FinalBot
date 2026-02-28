@@ -30,12 +30,15 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class ShooterSubsystem extends SubsystemBase {
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
+  private final double TARGET_RPS = 72.6;
+  private double m_targetRPS = TARGET_RPS;
   public ShooterSubsystem() {
   TalonFXConfiguration config = new TalonFXConfiguration();
-  config.Slot0.kP = 0.11;
+  config.Slot0.kP = 0.12;
   config.Slot0.kI = 0;
   config.Slot0.kD = 0;
-  config.Slot0.kV = 0.12;
+  config.Slot0.kV = 0.126;
+  config.Slot0.kS = 0.0;
   config.CurrentLimits.StatorCurrentLimit = 60;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
   config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -90,14 +93,45 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command JustShoot() {
     return run(
         () -> {
-            setShooterVelocity(2909 );
+            setShooterVelocity(m_targetRPS);
         }).finallyDo(interrupted->endMove());
       }
+
+  public Command ReverseShooter() {
+    return run(
+        () -> {
+            setShooterVelocity(-12);
+        }).finallyDo(interrupted->endMove());
+      }
+
   public void setShooterVelocity(double targetRPS){
     ShooterMotor.setControl(m_velocity.withVelocity(targetRPS));
   }
+
+  public double getShooterVelocity() {
+    return ShooterMotor.getVelocity().getValueAsDouble();
+  }
+
   public void stop(){
     ShooterMotor.setControl(new com.ctre.phoenix6.controls.NeutralOut());
+  }
+
+  public Command velocityIncrease() {
+    return runOnce(
+      () -> m_targetRPS *= 1.1
+    );
+  }
+
+  public Command velocityDecrease() {
+    return runOnce(
+      () -> m_targetRPS /= 1.1
+    );
+  }
+
+  public Command velocityReset() {
+    return runOnce(
+      () -> m_targetRPS = TARGET_RPS
+    );
   }
 
   /**
