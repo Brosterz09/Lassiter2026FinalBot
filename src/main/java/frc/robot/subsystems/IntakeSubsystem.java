@@ -116,7 +116,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command RunIntake() {
     return run(
       () -> {
-        setIntakeVelocity(40);
+        setIntakeVelocity(-60);
       }
     ).finallyDo(interrupted->endIntakeMove());
   }

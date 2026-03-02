@@ -88,7 +88,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void getSpeedForDistance(double distanceMeters) {
     double KP = .27827842218;
-    speed =  distanceMeters*KP + 8;
+    speed =  distanceMeters*KP + 12;
   }
 
   public Command JustShoot() {

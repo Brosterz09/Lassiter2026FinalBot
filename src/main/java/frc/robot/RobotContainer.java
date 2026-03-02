@@ -93,11 +93,12 @@ public class RobotContainer {
         joystick.leftBumper().whileTrue(m_shooterSubsystem.ReverseShooter());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
-        joystick.a().onTrue(m_IntakeSubsystem.SetIntakeArmDown());
-        joystick.b().onTrue(m_IntakeSubsystem.SetIntakeArmUp());
+        joystick.a().onTrue(m_IntakeSubsystem.IntakeArmDown());
+        joystick.b().onTrue(m_IntakeSubsystem.IntakeArmUp());
         joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
         joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
         joystick.rightTrigger().whileTrue(
+            Commands.sequence(
             Commands.parallel(
                 drivetrain.aimAtHub(
                     drive,
@@ -105,10 +106,12 @@ public class RobotContainer {
                     () ->  joystick.getLeftX() * MaxSpeed,
                     MaxAngularRate
                 ),
-                m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
-                m_IndexSubsystem.RunSpindexer()
-            )
-        );
+                m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose)
+                
+            ),
+            
+            m_IndexSubsystem.RunSpindexer()
+        ));
         joystick2.x().onTrue(m_shooterSubsystem.velocityIncrease());
         joystick2.y().onTrue(m_shooterSubsystem.velocityDecrease());
         joystick2.a().onTrue(m_IndexSubsystem.velocityIncrease());
