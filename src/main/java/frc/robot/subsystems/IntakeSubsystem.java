@@ -7,6 +7,8 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.AbstractQueue;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -21,10 +23,10 @@ public class IntakeSubsystem extends SubsystemBase {
   TalonFX IntakeArmMotor = new TalonFX(25);
   TalonFX IntakeMotor = new TalonFX(14);
 
-  private boolean reversed = true;
-
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionArm = new PositionVoltage(0);
+  private final double ARM_DOWN_POSITION = 0;
+  private final double ARM_UP_POSITION = -6.25;
 
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
@@ -41,14 +43,14 @@ public class IntakeSubsystem extends SubsystemBase {
       IntakeMotor.getConfigurator().apply(config);
 
       TalonFXConfiguration armConfig = new TalonFXConfiguration();
-      config.Slot0.kP = 0.098;
+      config.Slot0.kP = 1;
       config.Slot0.kI = 0;
       config.Slot0.kD = 0;
-      config.Slot0.kV = 0.098;
+      config.Slot0.kV = 1;
       config.Slot0.kS = 0.0;
       config.CurrentLimits.StatorCurrentLimit = 60;
       config.CurrentLimits.StatorCurrentLimitEnable = true;
-      config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+      config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       IntakeArmMotor.getConfigurator().apply(armConfig);
   }
@@ -82,7 +84,19 @@ public class IntakeSubsystem extends SubsystemBase {
     public void stopIntake(){
       IntakeMotor.setControl(new com.ctre.phoenix6.controls.NeutralOut());
     }
+    public Command SetIntakeArmDown() {
+    return runOnce(
+        () -> {
+          IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_DOWN_POSITION));
+        });
+      }
 
+  public Command SetIntakeArmUp() {
+    return runOnce(
+        () -> {
+            IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_UP_POSITION));
+        });
+    }
 
     public Command IntakeArmDown() {
     return run(

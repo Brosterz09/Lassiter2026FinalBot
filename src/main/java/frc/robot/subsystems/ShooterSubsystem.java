@@ -30,7 +30,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class ShooterSubsystem extends SubsystemBase {
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
-  private final double TARGET_RPS = 72.6;
+  private final double TARGET_RPS = 100.0;
   private double m_targetRPS = TARGET_RPS;
   public ShooterSubsystem() {
   TalonFXConfiguration config = new TalonFXConfiguration();
@@ -65,7 +65,7 @@ public class ShooterSubsystem extends SubsystemBase {
             ? blueHub : redHub;
         double distance = poseSupplier.get().getTranslation().getDistance(hub);
         getSpeedForDistance(distance);
-        ShooterMotor.setControl(new VoltageOut(-speed));
+        ShooterMotor.setControl(new VoltageOut(speed));
     }).finallyDo(interrupted -> endMove());
 }
 
@@ -78,8 +78,9 @@ public class ShooterSubsystem extends SubsystemBase {
             Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                 ? blueHubPosition : redHubPosition;
             double distance = poseSupplier.get().getTranslation().getDistance(hub);
+            System.out.println(distance);
             getSpeedForDistance(distance);
-            ShooterMotor.setControl(new VoltageOut(-speed));
+            ShooterMotor.setControl(new VoltageOut(speed));
         },
         () -> endMove()
     ).withTimeout(4.0);
@@ -87,7 +88,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public void getSpeedForDistance(double distanceMeters) {
     double KP = .27827842218;
-    speed =  distanceMeters*KP + 1.4;
+    speed =  distanceMeters*KP + 8;
   }
 
   public Command JustShoot() {

@@ -93,8 +93,8 @@ public class RobotContainer {
         joystick.leftBumper().whileTrue(m_shooterSubsystem.ReverseShooter());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
-        //joystick.a().whileTrue(m_IntakeSubsystem.IntakeArmDown());
-        //joystick.b().whileTrue(m_IntakeSubsystem.IntakeArmUp());
+        joystick.a().onTrue(m_IntakeSubsystem.SetIntakeArmDown());
+        joystick.b().onTrue(m_IntakeSubsystem.SetIntakeArmUp());
         joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
         joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
         joystick.rightTrigger().whileTrue(
