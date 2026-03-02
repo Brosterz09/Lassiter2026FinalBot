@@ -49,7 +49,7 @@ public class RobotContainer {
     private final CommandXboxController joystick2 = new CommandXboxController(1);
     public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
-    public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem();
+    public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem(m_shooterSubsystem);
     public final HangSubsystem m_HangSubsystem = new HangSubsystem();
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -98,7 +98,6 @@ public class RobotContainer {
         joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
         joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
         joystick.rightTrigger().whileTrue(
-            Commands.sequence(
             Commands.parallel(
                 drivetrain.aimAtHub(
                     drive,
@@ -106,12 +105,10 @@ public class RobotContainer {
                     () ->  joystick.getLeftX() * MaxSpeed,
                     MaxAngularRate
                 ),
-                m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose)
-                
-            ),
-            
-            m_IndexSubsystem.RunSpindexer()
-        ));
+                m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
+                m_IndexSubsystem.RunSpindexer()
+            )
+        );
         joystick2.x().onTrue(m_shooterSubsystem.velocityIncrease());
         joystick2.y().onTrue(m_shooterSubsystem.velocityDecrease());
         joystick2.a().onTrue(m_IndexSubsystem.velocityIncrease());

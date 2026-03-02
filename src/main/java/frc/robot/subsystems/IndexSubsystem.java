@@ -24,9 +24,9 @@ public class IndexSubsystem extends SubsystemBase {
 
   private final double TARGET_RPS = -40;
   private double m_targetRPS = TARGET_RPS;
-
-  public IndexSubsystem() {
-    
+  private ShooterSubsystem m_shooter;
+  public IndexSubsystem(ShooterSubsystem shooter) {
+    m_shooter = shooter;
     TalonFXConfiguration config = new TalonFXConfiguration();
       config.Slot0.kP = 0.098;
       config.Slot0.kI = 0;
@@ -44,7 +44,11 @@ public class IndexSubsystem extends SubsystemBase {
   public Command RunSpindexer() {
     return run(
         () -> {
+          if (m_shooter.atSpeed()) {
             setIndexerVelocity(m_targetRPS);
+          } else {
+            setIndexerVelocity(0);
+          }
          }
     ).finallyDo(interrupted->stop());
   }

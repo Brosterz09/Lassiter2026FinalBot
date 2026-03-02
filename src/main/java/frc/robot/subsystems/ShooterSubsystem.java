@@ -30,7 +30,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class ShooterSubsystem extends SubsystemBase {
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
-  private final double TARGET_RPS = 100.0;
+  private final double TARGET_RPS = 90.0;
   private double m_targetRPS = TARGET_RPS;
   public ShooterSubsystem() {
   TalonFXConfiguration config = new TalonFXConfiguration();
@@ -91,6 +91,9 @@ public class ShooterSubsystem extends SubsystemBase {
     speed =  distanceMeters*KP + 12;
   }
 
+  public boolean atSpeed() {
+    return getShooterVelocity() >= .9 * m_targetRPS;
+  }
   public Command JustShoot() {
     return run(
         () -> {
