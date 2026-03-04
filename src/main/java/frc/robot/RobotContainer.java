@@ -58,8 +58,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoMoveShooter(() -> drivetrain.getState().Pose));
         NamedCommands.registerCommand("Spindex", m_IndexSubsystem.AutoRunSpindexer());
         NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
-        NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
-        NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
+        NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.SetIntakeArmDown());
+        NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.SetIntakeArmUp());
         NamedCommands.registerCommand("Hang", m_HangSubsystem.AutoHangBot());
         //  NamedCommands.registerCommand("Hang", m_hangSubsystem.HangUp());
         
@@ -89,7 +89,7 @@ public class RobotContainer {
                     .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-        joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
+        joystick.leftTrigger().onTrue(m_IntakeSubsystem.RunIntake());
         joystick.leftBumper().whileTrue(m_shooterSubsystem.ReverseShooter());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
@@ -100,6 +100,18 @@ public class RobotContainer {
         joystick.rightTrigger().whileTrue(
             Commands.parallel(
                 drivetrain.aimAtHub(
+                    drive,
+                    () ->  joystick.getLeftY() * MaxSpeed,
+                    () ->  joystick.getLeftX() * MaxSpeed,
+                    MaxAngularRate
+                ),
+                m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
+                m_IndexSubsystem.RunSpindexer()
+            )
+        );
+        joystick.rightBumper().whileTrue(
+            Commands.parallel(
+                drivetrain.aimAtAllianceSide(
                     drive,
                     () ->  joystick.getLeftY() * MaxSpeed,
                     () ->  joystick.getLeftX() * MaxSpeed,

@@ -386,21 +386,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
-    Translation2d blueHub = new Translation2d(4.6, 3.75);
-    Translation2d redHub = new Translation2d(11.9, 3.75);
+    Translation2d blueHub = new Translation2d(4.4, 3.775);
+    Translation2d redHub = new Translation2d(12.125, 4.225);
 
     return run(() -> {
         Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
             ? blueHub : redHub;
-        System.out.println(hub);
         Pose2d currentPose = getState().Pose;
         Translation2d toHub = hub.minus(currentPose.getTranslation());
         Rotation2d targetAngle = toHub.getAngle();
-        System.out.println(targetAngle);
-
         double error = targetAngle.minus(currentPose.getRotation()).getRadians();
         System.out.println(error);
-        double kP = 7; 
+        double kP = 6; 
         double rotationSpeed = error * kP;
 
         rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
@@ -408,10 +405,33 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         setControl(drive
             .withVelocityX(-vx.get())
             .withVelocityY(-vy.get())
-            .withRotationalRate(-rotationSpeed)
+            .withRotationalRate(rotationSpeed)
+        );
+    });
+}
+    public Command aimAtAllianceSide(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
+    return run(() -> {
+        // Blue faces their wall at 180°, Red faces their wall at 0°
+        Rotation2d targetAngle = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            ? Rotation2d.fromDegrees(180)
+            : Rotation2d.fromDegrees(0);
+
+        Pose2d currentPose = getState().Pose;
+        double error = targetAngle.minus(currentPose.getRotation()).getRadians();
+
+        double kP = 6;
+        double rotationSpeed = error * kP;
+        rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
+
+        setControl(drive
+            .withVelocityX(-vx.get())
+            .withVelocityY(-vy.get())
+            .withRotationalRate(rotationSpeed)
         );
     });
 }
 }
+
+
     
     

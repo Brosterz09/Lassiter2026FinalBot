@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.505904255319149,
-        "y": 5.125418882978724
+        "x": 1.9082513297872343,
+        "y": 4.956316489361702
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.2114694148936174,
-        "y": 5.055445478723405
+        "x": 2.6138164893617026,
+        "y": 4.886343085106383
       },
       "isLocked": false,
       "linkedName": "EndOfIntake"
@@ -53,7 +53,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -19.783591366355296
+    "rotation": -24.67927106188905
   },
   "useDefaultConstraints": true
 }

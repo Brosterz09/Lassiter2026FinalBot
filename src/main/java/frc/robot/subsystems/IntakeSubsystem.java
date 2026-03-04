@@ -29,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final double ARM_UP_POSITION = 0;
 
   private final TalonFXConfiguration m_armConfig;
-
+  public boolean Intaking = false;
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
       TalonFXConfiguration config = new TalonFXConfiguration();
@@ -43,7 +43,6 @@ public class IntakeSubsystem extends SubsystemBase {
       config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       IntakeMotor.getConfigurator().apply(config);
-
       m_armConfig = new TalonFXConfiguration();
       m_armConfig.Slot0.kP = 2.0;
       m_armConfig.Slot0.kI = 0;
@@ -126,18 +125,25 @@ public class IntakeSubsystem extends SubsystemBase {
   //   }
 
   public Command RunIntake() {
-    return run(
+    return runOnce(
       () -> {
-        setIntakeVelocity(-60);
+        if(Intaking == false) {
+          Intaking = true;
+          setIntakeVelocity(-60);
+        }
+        else {
+          Intaking = false;
+          stopIntake();
+        }
       }
-    ).finallyDo(interrupted->endIntakeMove());
+    );
   }
 
   public Command AutoRunIntake() {
     return runEnd(
-        () -> IntakeMotor.set(.4),
+        () -> IntakeMotor.set(.6),
         () -> endIntakeMove()
-        ).withTimeout(4);
+        ).withTimeout(5);
       }
 
   public Command AutoBringIntakeUP() {

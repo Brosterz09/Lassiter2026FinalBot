@@ -58,8 +58,8 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return a command
    */
   public Command MoveShooterWithDistance(Supplier<Pose2d> poseSupplier) {
-    Translation2d blueHub = new Translation2d(4.6, 4.0);
-    Translation2d redHub = new Translation2d(11.9, 4.0);
+    Translation2d blueHub = new Translation2d(4.625, 3.775);
+    Translation2d redHub = new Translation2d(11.915, 3.775);
     return run(() -> {
         Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
             ? blueHub : redHub;
@@ -71,8 +71,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
   public Command AutoMoveShooter(Supplier<Pose2d> poseSupplier) {
-    Translation2d blueHubPosition = new Translation2d(4.6, 4.0);
-    Translation2d redHubPosition = new Translation2d(11.9,4.0);
+    Translation2d blueHubPosition = new Translation2d(4.625, 3.775);
+    Translation2d redHubPosition = new Translation2d(11.915,3.775);
     return runEnd(
         () -> {
             Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
@@ -83,7 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterMotor.setControl(new VoltageOut(speed));
         },
         () -> endMove()
-    ).withTimeout(4.0);
+    ).withTimeout(5.0);
 }
 
   public void getSpeedForDistance(double distanceMeters) {
