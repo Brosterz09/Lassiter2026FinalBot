@@ -20,13 +20,12 @@
     },
     "windows": {
       "/Pose": {
-        "bottom": 1914,
-        "height": 8.069275856018066,
-        "left": 245,
-        "right": 3942,
-        "top": 118,
-        "width": 16.54119300842285,
+        "builtin": "",
+        "height": 8.051901817321777,
+        "image": "C:\\Users\\lassi\\Downloads\\2026-field (1).png",
+        "width": 17.54825210571289,
         "window": {
+          "name": "2026",
           "visible": true
         }
       }
@@ -52,7 +51,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 314
+          "height": 0
         }
       ]
     },
@@ -65,7 +64,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 0
+          "height": 332
         }
       ]
     }

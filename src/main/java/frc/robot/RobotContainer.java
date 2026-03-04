@@ -86,17 +86,27 @@ public class RobotContainer {
             drivetrain.applyRequest(() ->
                 drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
                     .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                    .withRotationalRate(joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
-        joystick.leftTrigger().onTrue(m_IntakeSubsystem.RunIntake());
-        joystick.leftBumper().whileTrue(m_shooterSubsystem.ReverseShooter());
+        joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
+        joystick.leftBumper().whileTrue(m_IntakeSubsystem.RunIntakeReverse());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
         joystick.b().onTrue(m_IntakeSubsystem.SetIntakeArmDown());
         joystick.a().onTrue(m_IntakeSubsystem.SetIntakeArmUp());
-        joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
-        joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
+        joystick.x().whileTrue(
+            Commands.parallel(
+                m_shooterSubsystem.JustShoot(),
+                m_IndexSubsystem.RunSpindexer()
+            )
+            );
+        joystick.y().whileTrue(
+            Commands.parallel(
+                m_shooterSubsystem.ReverseShooter(),
+                m_IndexSubsystem.RunSpindexerReverse()
+            )
+            );
         joystick.rightTrigger().whileTrue(
             Commands.parallel(
                 drivetrain.aimAtHub(

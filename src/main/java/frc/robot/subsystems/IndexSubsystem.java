@@ -52,6 +52,13 @@ public class IndexSubsystem extends SubsystemBase {
          }
     ).finallyDo(interrupted->stop());
   }
+  public Command RunSpindexerReverse() {
+    return run(
+        () -> {
+            setIndexerVelocity(-m_targetRPS);
+         }
+    ).finallyDo(interrupted->stop());
+  }
 
   public Command AutoRunSpindexer() {
     return runEnd(

@@ -30,6 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final TalonFXConfiguration m_armConfig;
   public boolean Intaking = false;
+  public boolean ReverseIntaking = false;
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
       TalonFXConfiguration config = new TalonFXConfiguration();
@@ -125,18 +126,18 @@ public class IntakeSubsystem extends SubsystemBase {
   //   }
 
   public Command RunIntake() {
-    return runOnce(
+    return run(
       () -> {
-        if(Intaking == false) {
-          Intaking = true;
-          setIntakeVelocity(-60);
-        }
-        else {
-          Intaking = false;
-          stopIntake();
-        }
+        setIntakeVelocity(-60);
       }
-    );
+    ).finallyDo(interrupted -> stopIntake());
+  }
+  public Command RunIntakeReverse() {
+    return run(
+      () -> {
+          setIntakeVelocity(60);
+      }
+    ).finallyDo(interrupted -> stopIntake());
   }
 
   public Command AutoRunIntake() {
