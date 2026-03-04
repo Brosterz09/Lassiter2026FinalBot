@@ -25,8 +25,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionArm = new PositionVoltage(0);
-  private final double ARM_DOWN_POSITION = 0;
-  private final double ARM_UP_POSITION = -6.25;
+  private final double ARM_DOWN_POSITION = 6.7;
+  private final double ARM_UP_POSITION = 0;
+
+  private final TalonFXConfiguration m_armConfig;
 
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
@@ -42,17 +44,22 @@ public class IntakeSubsystem extends SubsystemBase {
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       IntakeMotor.getConfigurator().apply(config);
 
-      TalonFXConfiguration armConfig = new TalonFXConfiguration();
-      config.Slot0.kP = 1;
-      config.Slot0.kI = 0;
-      config.Slot0.kD = 0;
-      config.Slot0.kV = 1;
-      config.Slot0.kS = 0.0;
-      config.CurrentLimits.StatorCurrentLimit = 60;
-      config.CurrentLimits.StatorCurrentLimitEnable = true;
-      config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-      config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-      IntakeArmMotor.getConfigurator().apply(armConfig);
+      m_armConfig = new TalonFXConfiguration();
+      m_armConfig.Slot0.kP = 2.0;
+      m_armConfig.Slot0.kI = 0;
+      m_armConfig.Slot0.kD = 0;
+      m_armConfig.Slot0.kV = 3.0;
+      m_armConfig.Slot0.kS = 8;
+      m_armConfig.Slot1.kP = .3;
+      m_armConfig.Slot1.kI = 0;
+      m_armConfig.Slot1.kD = 0;
+      m_armConfig.Slot1.kV = 0.3;
+      m_armConfig.Slot1.kS = 0;
+      m_armConfig.CurrentLimits.StatorCurrentLimit = 60;
+      m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+      m_armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+      m_armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+      IntakeArmMotor.getConfigurator().apply(m_armConfig);
   }
 
   /**
@@ -80,38 +87,43 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setIntakeVelocity(double targetRPS){
       IntakeMotor.setControl(m_velocityIntake.withVelocity(targetRPS));
     }
-  
+
     public void stopIntake(){
       IntakeMotor.setControl(new com.ctre.phoenix6.controls.NeutralOut());
     }
+
     public Command SetIntakeArmDown() {
-    return runOnce(
-        () -> {
-          IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_DOWN_POSITION));
-        });
-      }
+    return run(
+      () -> {
+        IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_DOWN_POSITION).withSlot(1));
+      }).finallyDo(Interrupted -> stopIntake());
+    }
+        // () -> {
+        //   IntakeArmMotor.set(.25);
+        // }).until(() -> Math.abs(IntakeArmMotor.getPosition().getValueAsDouble()+.47) <= .5)
+        // .finallyDo(interrupted ->IntakeArmMotor.set(0));
 
   public Command SetIntakeArmUp() {
-    return runOnce(
-        () -> {
-            IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_UP_POSITION));
-        });
+    return run(
+      () -> {
+        IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_UP_POSITION).withSlot(0));
+      }).finallyDo(Interrupted -> stopIntake());
     }
 
-    public Command IntakeArmDown() {
-    return run(
-        () -> {
-            // double leverPosition = IntakeArmMotor.getPosition().getValueAsDouble();
-            IntakeArmMotor.set(.5);
-        }).finallyDo(interrupted->endLeverMove());
-      }
+  //   public Command IntakeArmDown() {
+  //   return run(
+  //       () -> {
+  //           // double leverPosition = IntakeArmMotor.getPosition().getValueAsDouble();
+  //           IntakeArmMotor.set(.5);
+  //       }).finallyDo(interrupted->endLeverMove());
+  //     }
 
-  public Command IntakeArmUp() {
-    return run(
-        () -> {
-            IntakeArmMotor.set(-.5);
-        }).finallyDo(interrupted->endLeverMove());
-    }
+  // public Command IntakeArmUp() {
+  //   return run(
+  //       () -> {
+  //           IntakeArmMotor.set(-.5);
+  //       }).finallyDo(interrupted->endLeverMove());
+  //   }
 
   public Command RunIntake() {
     return run(

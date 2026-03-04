@@ -36,6 +36,9 @@
     "mode": "Client (NT4)",
     "visible": false
   },
+  "NetworkTables View": {
+    "visible": false
+  },
   "Plots": {
     "Plot <0>": {
       "plots": [

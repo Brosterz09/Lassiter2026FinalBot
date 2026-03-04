@@ -71,7 +71,7 @@ public class RobotContainer {
         LimelightHelpers.setCameraPose_RobotSpace(
     "limelight-back",
     -0.3283458, -0.0896112, 0.17145,
-    0.0, 15.0, 180.0
+    0.0, 180.0, 180.0
         );
         drivetrain.configureAutoBuilder();
     
@@ -93,8 +93,8 @@ public class RobotContainer {
         joystick.leftBumper().whileTrue(m_shooterSubsystem.ReverseShooter());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
-        joystick.a().onTrue(m_IntakeSubsystem.IntakeArmDown());
-        joystick.b().onTrue(m_IntakeSubsystem.IntakeArmUp());
+        joystick.b().onTrue(m_IntakeSubsystem.SetIntakeArmDown());
+        joystick.a().onTrue(m_IntakeSubsystem.SetIntakeArmUp());
         joystick.x().whileTrue(m_shooterSubsystem.JustShoot());
         joystick.y().whileTrue(m_IndexSubsystem.RunSpindexer());
         joystick.rightTrigger().whileTrue(
