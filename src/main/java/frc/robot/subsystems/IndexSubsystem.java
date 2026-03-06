@@ -22,7 +22,7 @@ public class IndexSubsystem extends SubsystemBase {
   private final InterpolatingDoubleTreeMap indexerSpeedMap = new InterpolatingDoubleTreeMap();
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
 
-  private final double TARGET_RPS = -40;
+  private final double TARGET_RPS = -75;
   private double m_targetRPS = TARGET_RPS;
   private ShooterSubsystem m_shooter;
   public IndexSubsystem(ShooterSubsystem shooter) {

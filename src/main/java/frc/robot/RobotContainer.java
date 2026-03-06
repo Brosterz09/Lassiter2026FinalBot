@@ -56,10 +56,11 @@ public class RobotContainer {
 
     public RobotContainer() {
         NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoMoveShooter(() -> drivetrain.getState().Pose));
+        NamedCommands.registerCommand("BackShots", m_shooterSubsystem.BackShots());
         NamedCommands.registerCommand("Spindex", m_IndexSubsystem.AutoRunSpindexer());
         NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
-        NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.SetIntakeArmDown());
-        NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.SetIntakeArmUp());
+        NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
+        NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
         NamedCommands.registerCommand("Hang", m_HangSubsystem.AutoHangBot());
         //  NamedCommands.registerCommand("Hang", m_hangSubsystem.HangUp());
         

@@ -83,7 +83,15 @@ public class ShooterSubsystem extends SubsystemBase {
             ShooterMotor.setControl(new VoltageOut(speed));
         },
         () -> endMove()
-    ).withTimeout(5.0);
+    ).withTimeout(7.0);
+}
+  public Command BackShots() {
+    return runEnd(
+        () -> {
+          setShooterVelocity(m_targetRPS);
+        },
+        () -> endMove()
+    ).withTimeout(.5);
 }
 
   public void getSpeedForDistance(double distanceMeters) {
@@ -100,7 +108,6 @@ public class ShooterSubsystem extends SubsystemBase {
             setShooterVelocity(m_targetRPS);
         }).finallyDo(interrupted->endMove());
       }
-
   public Command ReverseShooter() {
     return run(
         () -> {

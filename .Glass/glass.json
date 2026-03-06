@@ -19,6 +19,11 @@
       "/SmartDashboard/PathPlanner": "Alerts"
     },
     "windows": {
+      "/FMSInfo": {
+        "window": {
+          "visible": true
+        }
+      },
       "/Pose": {
         "builtin": "",
         "height": 8.051901817321777,
@@ -32,7 +37,15 @@
     }
   },
   "NetworkTables Info": {
-    "visible": true
+    "Connections": {
+      "open": true
+    },
+    "Server": {
+      "Publishers": {
+        "open": true
+      },
+      "open": true
+    }
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",

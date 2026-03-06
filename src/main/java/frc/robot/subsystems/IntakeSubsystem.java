@@ -142,7 +142,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoRunIntake() {
     return runEnd(
-        () -> IntakeMotor.set(.6),
+        () -> setIntakeVelocity(-60),
         () -> endIntakeMove()
         ).withTimeout(5);
       }
@@ -156,9 +156,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoLowerIntakeDOWN() {
     return runEnd(
-        () -> IntakeArmMotor.set(.5),
+        () -> IntakeArmMotor.set(.2),
         () -> endLeverMove()
-        ).withTimeout(.6);
+        ).withTimeout(.3);
       }
 
   /**
