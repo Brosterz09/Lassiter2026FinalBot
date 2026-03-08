@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -26,7 +28,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionArm = new PositionVoltage(0);
   private final double ARM_DOWN_POSITION = 6.7;
-  private final double ARM_UP_POSITION = 0;
+  private final double ARM_UP_POSITION = -1.25;
 
   private final TalonFXConfiguration m_armConfig;
   public boolean Intaking = false;
@@ -39,23 +41,23 @@ public class IntakeSubsystem extends SubsystemBase {
       config.Slot0.kD = 0;
       config.Slot0.kV = 0.098;
       config.Slot0.kS = 0.0;
-      config.CurrentLimits.StatorCurrentLimit = 60;
+      config.CurrentLimits.StatorCurrentLimit = 45;
       config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       IntakeMotor.getConfigurator().apply(config);
       m_armConfig = new TalonFXConfiguration();
-      m_armConfig.Slot0.kP = 2.0;
+      m_armConfig.Slot0.kP = 3.0;
       m_armConfig.Slot0.kI = 0;
       m_armConfig.Slot0.kD = 0;
-      m_armConfig.Slot0.kV = 3.0;
+      m_armConfig.Slot0.kV = 3.6;
       m_armConfig.Slot0.kS = 8;
       m_armConfig.Slot1.kP = .3;
       m_armConfig.Slot1.kI = 0;
       m_armConfig.Slot1.kD = 0;
-      m_armConfig.Slot1.kV = 0.3;
+      m_armConfig.Slot1.kV = 5.3;
       m_armConfig.Slot1.kS = 0;
-      m_armConfig.CurrentLimits.StatorCurrentLimit = 60;
+      m_armConfig.CurrentLimits.StatorCurrentLimit = 45;
       m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       m_armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -128,14 +130,14 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command RunIntake() {
     return run(
       () -> {
-        setIntakeVelocity(-60);
+        setIntakeVelocity(-40);
       }
     ).finallyDo(interrupted -> stopIntake());
   }
   public Command RunIntakeReverse() {
     return run(
       () -> {
-          setIntakeVelocity(60);
+          setIntakeVelocity(100);
       }
     ).finallyDo(interrupted -> stopIntake());
   }
@@ -173,6 +175,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("IntakeVelocity", IntakeMotor.getVelocity().getValueAsDouble());
     // This method will be called once per scheduler run
   }
 

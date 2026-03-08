@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
@@ -28,11 +29,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public class ShooterSubsystem extends SubsystemBase {
+  private Supplier<Pose2d> m_poseSupplier;
   private final InterpolatingDoubleTreeMap shooterSpeedMap = new InterpolatingDoubleTreeMap();
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   private final double TARGET_RPS = 90.0;
+  public Translation2d blueHubPosition = new Translation2d(4.625, 3.775);
+  public Translation2d redHubPosition = new Translation2d(11.915,3.775);
   private double m_targetRPS = TARGET_RPS;
-  public ShooterSubsystem() {
+  public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
+  m_poseSupplier = poseSupplier;
   TalonFXConfiguration config = new TalonFXConfiguration();
   config.Slot0.kP = 0.12;
   config.Slot0.kI = 0;
@@ -58,29 +63,27 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return a command
    */
   public Command MoveShooterWithDistance(Supplier<Pose2d> poseSupplier) {
-    Translation2d blueHub = new Translation2d(4.625, 3.775);
-    Translation2d redHub = new Translation2d(11.915, 3.775);
+    Translation2d blueHub = new Translation2d(4.625, 3.8);
+    Translation2d redHub = new Translation2d(11.915, 3.8);
     return run(() -> {
         Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
             ? blueHub : redHub;
         double distance = poseSupplier.get().getTranslation().getDistance(hub);
-        getSpeedForDistance(distance);
-        ShooterMotor.setControl(new VoltageOut(speed));
+        System.out.println(distance);
+        // getSpeedForDistance(distance);
+        setShooterVelocity(m_targetRPS);
     }).finallyDo(interrupted -> endMove());
 }
 
 
   public Command AutoMoveShooter(Supplier<Pose2d> poseSupplier) {
-    Translation2d blueHubPosition = new Translation2d(4.625, 3.775);
-    Translation2d redHubPosition = new Translation2d(11.915,3.775);
     return runEnd(
         () -> {
             Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                 ? blueHubPosition : redHubPosition;
-            double distance = poseSupplier.get().getTranslation().getDistance(hub);
-            System.out.println(distance);
-            getSpeedForDistance(distance);
-            ShooterMotor.setControl(new VoltageOut(speed));
+            // double distance = poseSupplier.get().getTranslation().getDistance(hub);
+            // getSpeedForDistance(distance);
+            setShooterVelocity(m_targetRPS);
         },
         () -> endMove()
     ).withTimeout(7.0);
@@ -108,10 +111,17 @@ public class ShooterSubsystem extends SubsystemBase {
             setShooterVelocity(m_targetRPS);
         }).finallyDo(interrupted->endMove());
       }
+  public Command AutoJustShoot() {
+    return runEnd(
+        () -> {
+            setShooterVelocity(m_targetRPS);
+        },
+        () -> setShooterVelocity(0)).withTimeout(7.0);
+      }
   public Command ReverseShooter() {
     return run(
         () -> {
-            setShooterVelocity(-12);
+            setShooterVelocity(-100);
         }).finallyDo(interrupted->endMove());
       }
 
@@ -157,7 +167,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+            ? blueHubPosition : redHubPosition;
+        double distance = m_poseSupplier.get().getTranslation().getDistance(hub);
+      SmartDashboard.putNumber("DistanceToHub", distance);
   }
 
   @Override

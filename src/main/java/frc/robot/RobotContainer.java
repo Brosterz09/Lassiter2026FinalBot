@@ -44,18 +44,19 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
 
-
+    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController joystick2 = new CommandXboxController(1);
-    public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem();
+    public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(() -> drivetrain.getState().Pose);
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
     public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem(m_shooterSubsystem);
     public final HangSubsystem m_HangSubsystem = new HangSubsystem();
-    public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    
 
 
     public RobotContainer() {
-        NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoMoveShooter(() -> drivetrain.getState().Pose));
+        NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoJustShoot());
+        NamedCommands.registerCommand("TrigIntake", m_IntakeSubsystem.RunIntake());
         NamedCommands.registerCommand("BackShots", m_shooterSubsystem.BackShots());
         NamedCommands.registerCommand("Spindex", m_IndexSubsystem.AutoRunSpindexer());
         NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
@@ -85,8 +86,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -132,6 +133,9 @@ public class RobotContainer {
                 m_IndexSubsystem.RunSpindexer()
             )
         );
+        joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
+        joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
+
         joystick2.x().onTrue(m_shooterSubsystem.velocityIncrease());
         joystick2.y().onTrue(m_shooterSubsystem.velocityDecrease());
         joystick2.a().onTrue(m_IndexSubsystem.velocityIncrease());
@@ -148,7 +152,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        // joystick.a().whileTrue(drivetrain.applyRequest(() -> brake));
+        joystick.povLeft().whileTrue(drivetrain.applyRequest(() -> brake));
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         // ));
@@ -168,23 +172,24 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.sequence(
+         AutoBuilder.buildAuto("empty"));
+        // return m_HangSubsystem.AutoHangBot();
+        // Commands.waitSeconds(.4),
 
-        Commands.waitSeconds(.4),
-
-        Commands.runOnce(() -> {
-            if (LimelightHelpers.getTV("limelight-front")) {
-                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
-                drivetrain.resetPose(visionPose);
-                System.out.println("Pose reset to: " + visionPose);
-            } else if (LimelightHelpers.getTV("limelight-back")) {
-                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
-                drivetrain.resetPose(visionPose);
-                System.out.println("Pose reset from back camera: " + visionPose);
-            } else {
-                System.out.println("WARNING: No vision targets seen, using odometry pose");
-            }
-        }),
-        AutoBuilder.buildAuto("ExperimentalFinalAuto"));
+        // Commands.runOnce(() -> {
+        //     if (LimelightHelpers.getTV("limelight-front")) {
+        //         Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
+        //         drivetrain.resetPose(visionPose);
+        //         System.out.println("Pose reset to: " + visionPose);
+        //     } else if (LimelightHelpers.getTV("limelight-back")) {
+        //         Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
+        //         drivetrain.resetPose(visionPose);
+        //         System.out.println("Pose reset from back camera: " + visionPose);
+        //     } else {
+        //         System.out.println("WARNING: No vision targets seen, using odometry pose");
+        //     }
+        // }),
+       
         //Other Testing Autos
         // AutoBuilder.buildAuto("ExperimentalFinalAuto"); 
         // AutoBuilder.buildAuto("PrimeAuto");

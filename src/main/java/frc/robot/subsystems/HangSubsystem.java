@@ -7,20 +7,26 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel;
 
 public class HangSubsystem extends SubsystemBase {
   SparkMax HangMotor = new SparkMax(18, SparkMax.MotorType.kBrushless);
+  // RelativeEncoder encoder;
+  // SparkMaxConfig sConfig = new SparkMaxConfig();
+  public HangSubsystem() {
 
-
-  public HangSubsystem() {}
+  }
 
   
   public Command HangRobotUp() {
     return run(
         () -> {
-            HangMotor.set(.7);
+            // double currentPos = HangMotor.getRelativeEncoder();
+            HangMotor.set(.25);
          }
     ).finallyDo(interrupted->HangMotor.set(0));
 }
@@ -28,7 +34,7 @@ public class HangSubsystem extends SubsystemBase {
   public Command HangRobotDown() {
     return run(
         () -> {
-            HangMotor.set(-.7);
+            HangMotor.set(-.25);
          }
     ).finallyDo(interrupted->HangMotor.set(0));
 }

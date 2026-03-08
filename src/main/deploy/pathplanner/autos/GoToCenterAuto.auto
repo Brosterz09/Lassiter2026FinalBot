@@ -38,7 +38,26 @@
         {
           "type": "path",
           "data": {
-            "pathName": "IntakeFromDeposit"
+            "pathName": "CenterPAth"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "BackFromCenterY"
+                }
+              }
+            ]
           }
         },
         {
@@ -59,30 +78,11 @@
               }
             ]
           }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "HangAfterIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Hang"
-                }
-              }
-            ]
-          }
         }
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }

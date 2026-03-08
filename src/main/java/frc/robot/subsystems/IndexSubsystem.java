@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
@@ -33,7 +34,7 @@ public class IndexSubsystem extends SubsystemBase {
       config.Slot0.kD = 0;
       config.Slot0.kV = 0.098;
       config.Slot0.kS = 0.0;
-      config.CurrentLimits.StatorCurrentLimit = 60;
+      config.CurrentLimits.StatorCurrentLimit = 55;
       config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -69,8 +70,7 @@ public class IndexSubsystem extends SubsystemBase {
             setIndexerVelocity(0);
           }
         },
-        () -> setIndexerVelocity(0)
-    ).withTimeout(7);
+        () -> setIndexerVelocity(0)).withTimeout(7);
   }
    
   public void setIndexerVelocity(double targetRPS){
@@ -106,6 +106,7 @@ public class IndexSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("SpindexerVelocity", Indexer.getVelocity().getValueAsDouble());
   }
 
   @Override

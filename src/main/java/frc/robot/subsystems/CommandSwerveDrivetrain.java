@@ -403,9 +403,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
 
         setControl(drive
-            .withVelocityX(vx.get())
-            .withVelocityY(vy.get())
-            .withRotationalRate(-rotationSpeed)
+            .withVelocityX(-vx.get())
+            .withVelocityY(-vy.get())
+            .withRotationalRate(rotationSpeed)
         );
     });
 }
@@ -424,9 +424,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
 
         setControl(drive
-            .withVelocityX(vx.get())
-            .withVelocityY(vy.get())
-            .withRotationalRate(-rotationSpeed)
+            .withVelocityX(-vx.get())
+            .withVelocityY(-vy.get())
+            .withRotationalRate(rotationSpeed)
         );
     });
 }
