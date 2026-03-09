@@ -3,24 +3,18 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import com.ctre.phoenix6.controls.VoltageOut;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
-import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.spark.SparkLowLevel;
 
 public class IndexSubsystem extends SubsystemBase {
   TalonFX Indexer = new TalonFX(17);
-  private final InterpolatingDoubleTreeMap indexerSpeedMap = new InterpolatingDoubleTreeMap();
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
 
   private final double TARGET_RPS = -75;
@@ -34,7 +28,7 @@ public class IndexSubsystem extends SubsystemBase {
       config.Slot0.kD = 0;
       config.Slot0.kV = 0.098;
       config.Slot0.kS = 0.0;
-      config.CurrentLimits.StatorCurrentLimit = 55;
+      config.CurrentLimits.StatorCurrentLimit = 35;
       config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

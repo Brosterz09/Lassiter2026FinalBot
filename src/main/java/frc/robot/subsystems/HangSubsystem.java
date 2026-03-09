@@ -7,18 +7,20 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkLowLevel;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 public class HangSubsystem extends SubsystemBase {
   SparkMax HangMotor = new SparkMax(18, SparkMax.MotorType.kBrushless);
-  // RelativeEncoder encoder;
-  // SparkMaxConfig sConfig = new SparkMaxConfig();
-  public HangSubsystem() {
 
+  @SuppressWarnings("removal")
+  public HangSubsystem() {
+    SparkMaxConfig config = new SparkMaxConfig();
+    config.smartCurrentLimit(30);
+    config.idleMode(IdleMode.kBrake);
+    HangMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   

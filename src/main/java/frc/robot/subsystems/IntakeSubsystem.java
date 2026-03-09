@@ -4,17 +4,13 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import java.util.AbstractQueue;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -26,7 +22,7 @@ public class IntakeSubsystem extends SubsystemBase {
   TalonFX IntakeMotor = new TalonFX(14);
 
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
-  private final PositionVoltage m_positionArm = new PositionVoltage(0);
+  private final MotionMagicVoltage m_motionMagicArm = new MotionMagicVoltage(0);
   private final double ARM_DOWN_POSITION = 6.7;
   private final double ARM_UP_POSITION = -1.25;
 
@@ -54,13 +50,16 @@ public class IntakeSubsystem extends SubsystemBase {
       m_armConfig.Slot0.kS = 8;
       m_armConfig.Slot1.kP = .3;
       m_armConfig.Slot1.kI = 0;
-      m_armConfig.Slot1.kD = 0;
-      m_armConfig.Slot1.kV = 5.3;
+      m_armConfig.Slot1.kD = 0.1;
+      m_armConfig.Slot1.kV = 1.5;
       m_armConfig.Slot1.kS = 0;
-      m_armConfig.CurrentLimits.StatorCurrentLimit = 45;
+      m_armConfig.CurrentLimits.StatorCurrentLimit = 30;
       m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       m_armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+      m_armConfig.MotionMagic.MotionMagicCruiseVelocity = 4;
+      m_armConfig.MotionMagic.MotionMagicAcceleration = 8;
+      m_armConfig.MotionMagic.MotionMagicJerk = 40;
       IntakeArmMotor.getConfigurator().apply(m_armConfig);
   }
 
@@ -97,7 +96,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command SetIntakeArmDown() {
     return run(
       () -> {
-        IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_DOWN_POSITION).withSlot(1));
+        IntakeArmMotor.setControl(m_motionMagicArm.withPosition(ARM_DOWN_POSITION).withSlot(1));
       }).finallyDo(Interrupted -> stopIntake());
     }
         // () -> {
@@ -108,7 +107,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command SetIntakeArmUp() {
     return run(
       () -> {
-        IntakeArmMotor.setControl(m_positionArm.withPosition(ARM_UP_POSITION).withSlot(0));
+        IntakeArmMotor.setControl(m_motionMagicArm.withPosition(ARM_UP_POSITION).withSlot(0));
       }).finallyDo(Interrupted -> stopIntake());
     }
 

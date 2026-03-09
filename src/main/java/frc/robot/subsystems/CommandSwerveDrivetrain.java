@@ -15,9 +15,8 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
-import edu.wpi.first.wpilibj.Timer;
-
 import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,11 +31,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.LimelightHelpers;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.RobotContainer;
-import java.util.ArrayList;
-import java.util.List;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.wpilibj.Timer;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements
@@ -46,7 +40,6 @@ import edu.wpi.first.wpilibj.Timer;
  * https://v6.docs.ctr-electronics.com/en/stable/docs/tuner/tuner-swerve/index.html
  */
 public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Subsystem {
-    private Timer VisionTimer = new Timer();
     private static final double kSimLoopPeriod = 0.004; // 4 ms
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
@@ -285,6 +278,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
             });
         }
+
+        // Feed gyro heading to Limelights for MegaTag2
+        double yaw = getState().Pose.getRotation().getDegrees();
+        LimelightHelpers.SetRobotOrientation("limelight-front", yaw, 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-back", yaw, 0, 0, 0, 0, 0);
+
         updateVisionFromCamera("limelight-front");
         updateVisionFromCamera("limelight-back");
     }
@@ -366,23 +365,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         //     }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
         // }
     private void updateVisionFromCamera(String cameraName) {
-        boolean valid = LimelightHelpers.getTV(cameraName);
+        LimelightHelpers.PoseEstimate mt2 =
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
 
-        if (valid) {
-            Pose2d botpose = LimelightHelpers.getBotPose2d_wpiBlue(cameraName);
-            double timestamp = LimelightHelpers.getLatency_Pipeline(cameraName) / 1000.0
-                            + LimelightHelpers.getLatency_Capture(cameraName) / 1000.0;
-            double latencyAdjustedTimestamp = Timer.getFPGATimestamp() - timestamp;
+        if (mt2 == null || mt2.tagCount == 0) return;
 
-            int tagCount = LimelightHelpers.getTargetCount(cameraName);
+        // Reject measurements during fast rotation (MegaTag2 is unreliable)
+        if (Math.abs(getState().Speeds.omegaRadiansPerSecond) > Math.toRadians(720)) return;
 
-        if (tagCount >= 2) {
-            addVisionMeasurement(botpose, latencyAdjustedTimestamp,
-                VecBuilder.fill(0.5, 0.5, 0.7));
-            } else if (tagCount == 1) {
-            addVisionMeasurement(botpose, latencyAdjustedTimestamp,
-                VecBuilder.fill(1.0, 1.0, 1.5));
-            }
+        // Reject poses outside field boundaries
+        if (mt2.pose.getX() < 0 || mt2.pose.getX() > 16.5
+            || mt2.pose.getY() < 0 || mt2.pose.getY() > 8.2) return;
+
+        // Set theta std dev to effectively infinite -- never correct heading from vision
+        if (mt2.tagCount >= 2) {
+            addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
+                VecBuilder.fill(0.5, 0.5, 9999999));
+        } else {
+            addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
+                VecBuilder.fill(1.0, 1.0, 9999999));
         }
     }
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
@@ -396,8 +397,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Translation2d toHub = hub.minus(currentPose.getTranslation());
         Rotation2d targetAngle = toHub.getAngle();
         double error = targetAngle.minus(currentPose.getRotation()).getRadians();
-        System.out.println(error);
-        double kP = 6; 
+        double kP = 6;
         double rotationSpeed = error * kP;
 
         rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));

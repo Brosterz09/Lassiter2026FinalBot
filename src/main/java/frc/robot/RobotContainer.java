@@ -6,13 +6,9 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.util.ArrayList;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.fasterxml.jackson.databind.util.Named;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-import com.ctre.phoenix6.hardware.jni.HardwareJNI;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -133,8 +129,6 @@ public class RobotContainer {
                 m_IndexSubsystem.RunSpindexer()
             )
         );
-        joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
-        joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
 
         joystick2.x().onTrue(m_shooterSubsystem.velocityIncrease());
         joystick2.y().onTrue(m_shooterSubsystem.velocityDecrease());
@@ -164,8 +158,8 @@ public class RobotContainer {
         // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // Reset the field-centric heading on left bumper press.
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        // Reset the field-centric heading on start button press.
+        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
