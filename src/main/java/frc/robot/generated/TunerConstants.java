@@ -24,11 +24,9 @@ public class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGains = new Slot0Configs()
-        // .withKP(100).withKI(0).withKD(0.1)
-        // .withKS(0.1).withKV(2.49).withKA(0)
-        .withKP(60)    // Lower = softer response
+        .withKP(100)
         .withKI(0)
-        .withKD(0.01)
+        .withKD(0.1)
         .withKS(0.1)
         .withKV(0.124)
         .withKA(0)
@@ -78,6 +76,12 @@ public class TunerConstants {
                 .withStatorCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(Amps.of(20))
                 .withSupplyCurrentLimitEnable(true)
+        )
+        .withMotorOutput(
+            new MotorOutputConfigs()
+                // Brake mode holds the wheel angle during disabled so wheels don't drift
+                // between disabled and auto enable, preventing the robot from lurching.
+                .withNeutralMode(NeutralModeValue.Brake)
         );
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs

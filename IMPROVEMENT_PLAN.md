@@ -282,8 +282,86 @@ SmartDashboard.putNumber("ShooterDistance", distance);
 | **P1** | Lower shooter/indexer current limits | 3 | Easy |
 | **P1** | Configure hang SparkMax with current limit | 3 | Easy |
 | **P1** | Switch intake arm to MotionMagic, retune Slot 1 | 4 | Medium |
+| **P1** | Set steer motors to Brake neutral mode | 5 | Easy |
+| **P1** | Restore steer kP=100, kD=0.1 | 6 | Easy |
+| **P1** | Add pre-auto X-lock phase | 5 | Easy |
 | **P2** | Remove System.out.println from hot loops | General | Easy |
 | **P2** | Clean up unused imports and dead code | General | Easy |
 | **P2** | Standardize joystick negation convention | General | Easy |
 | **P2** | Remove duplicate povUp/povDown bindings | General | Easy |
-| **P3** | Consider closed-loop velocity drive mode | 3 | Medium |
+| **P3** | Consider closed-loop velocity drive mode | 3, 6 | Medium |
+
+---
+
+## Problem 5: Wheels Shift and Move the Robot at Auto Enable
+
+### Root Cause
+
+During disabled, the `SwerveRequest.Idle` applied in `RobotContainer.java` neutralizes all motors but does not actively hold any position. With steer motors in **Coast** neutral mode (the default if not explicitly set), the steer modules can physically drift to any angle while the robot is disabled — pushed by cable tension, field contact, or simply gravity on an uneven surface.
+
+When auto is enabled and the first PathPlanner command runs, the steer motors must rotate from their drifted angle to the first path heading. During this snap, the drive motors are already being commanded, pushing the robot in the wrong direction for a fraction of a second. This causes the visible lurch at auto start.
+
+### Fix A: Set Steer Motors to Brake Neutral Mode
+
+In `TunerConstants.java`, add `NeutralMode.Brake` to `steerInitialConfigs`:
+
+```java
+private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
+    .withCurrentLimits(...)
+    .withMotorOutput(
+        new MotorOutputConfigs()
+            .withNeutralMode(NeutralModeValue.Brake)
+    );
+```
+
+With Brake mode, when the steer motors are neutralized (during disabled), back-EMF braking physically resists rotation. The wheels stay where they were last commanded, rather than drifting freely.
+
+### Fix B: Add a Pre-Auto Wheel-Lock Phase
+
+Even with Brake mode, if the robot is pushed during staging, wheels may still be off-angle. In `getAutonomousCommand()`, prefix every auto routine with a brief `SwerveDriveBrake` (X-lock) phase:
+
+```java
+public Command getAutonomousCommand() {
+    return Commands.sequence(
+        drivetrain.applyRequest(() -> brake).withTimeout(0.25),
+        AutoBuilder.buildAuto("empty")
+    );
+}
+```
+
+For 0.25 seconds at auto start, wheels lock into the X-pattern with full steer motor torque. When the path begins, the wheels are in a known, stable state. The snap from 45° (X-position) to the path's initial direction is predictable and much smaller than a snap from a random drifted angle.
+
+---
+
+## Problem 6: Robot Arcs When Changing Drive Direction
+
+### Root Cause
+
+When the driver pushes the joystick in a new direction, swerve kinematics instantly computes new target angles for all four modules. However, the steer motors take time to rotate to those new angles. During this transition, the drive motors are still spinning — pushing the robot in the old direction while the wheels are mid-rotation. This produces the visible arc.
+
+Two factors in this codebase amplify the problem:
+
+**A. Steer kP was set too low (60 instead of 100).** In `TunerConstants.java`, the original gains were `kP=100, kD=0.1`. These were softened to `kP=60, kD=0.01`. A lower `kP` means the steer controller applies less force to reach the target angle, making the wheel rotation slower and extending the arc duration.
+
+**B. kD was set too low (0.01 instead of 0.1).** The derivative term damps the steer motor's angular velocity as it approaches the target. With very low `kD`, the motor can overshoot the target angle and oscillate, further delaying clean alignment.
+
+### Fix: Restore Steer Gains
+
+In `TunerConstants.java`, restore the original gains:
+
+```java
+private static final Slot0Configs steerGains = new Slot0Configs()
+    .withKP(100)
+    .withKI(0)
+    .withKD(0.1)
+    .withKS(0.1)
+    .withKV(0.124)
+    .withKA(0);
+```
+
+With `kP=100`, the steer motor responds aggressively to angle error, snapping wheels to their new heading much faster. With `kD=0.1`, the motor brakes as it approaches the target, preventing overshoot. Together these minimize the arc.
+
+### Additional Context: Cosine Compensation
+
+The CTRE Phoenix 6 swerve stack applies **cosine compensation** automatically: drive motor output is scaled by `cos(steer_error)`. When steer error is 90°, `cos(90°) = 0` and the drive output is zeroed. This is a built-in safety that limits arcing even with slow steer response. Restoring the steer gains reduces the *time* the steer error is large, which reduces the duration of the arc even though cosine compensation is already preventing the worst-case behavior.
+
