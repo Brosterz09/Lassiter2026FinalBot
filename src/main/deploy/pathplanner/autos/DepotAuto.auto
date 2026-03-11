@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "BackShots"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -33,6 +39,12 @@
           "type": "path",
           "data": {
             "pathName": "IntakeFromDeposit"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "BackShots"
           }
         },
         {

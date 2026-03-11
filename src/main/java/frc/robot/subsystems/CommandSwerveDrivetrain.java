@@ -405,7 +405,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         setControl(drive
             .withVelocityX(-vx.get())
             .withVelocityY(-vy.get())
-            .withRotationalRate(rotationSpeed)
+            .withRotationalRate(-rotationSpeed)
         );
     });
 }
@@ -426,7 +426,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         setControl(drive
             .withVelocityX(-vx.get())
             .withVelocityY(-vy.get())
-            .withRotationalRate(rotationSpeed)
+            .withRotationalRate(-rotationSpeed)
         );
     });
 }

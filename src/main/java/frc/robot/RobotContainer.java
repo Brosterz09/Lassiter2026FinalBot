@@ -93,6 +93,11 @@ public class RobotContainer {
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
         joystick.b().onTrue(m_IntakeSubsystem.SetIntakeArmDown());
         joystick.a().onTrue(m_IntakeSubsystem.SetIntakeArmUp());
+        joystick.povRight().whileTrue(
+            Commands.parallel(
+                m_shooterSubsystem.CrackCocaineShooter(),
+                m_IndexSubsystem.RunSpindexer()
+            ));
         joystick.x().whileTrue(
             Commands.parallel(
                 m_shooterSubsystem.JustShoot(),
