@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.033566333808844,
-        "y": 6.525691868758916
+        "x": 3.9873038516405135,
+        "y": 5.555292439372327
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.4254493580599137,
-        "y": 7.276134094151213
+        "x": 2.7969472182596284,
+        "y": 6.590385164051355
       },
       "isLocked": false,
       "linkedName": null
@@ -20,12 +20,12 @@
         "y": 7.253776595744681
       },
       "prevControl": {
-        "x": 1.1126846132596155,
-        "y": 7.334698515510429
+        "x": 1.309001426533523,
+        "y": 7.302011412268189
       },
       "nextControl": {
-        "x": 0.6396026207829375,
-        "y": 7.172854675978934
+        "x": 0.6276814847796326,
+        "y": 7.226089616098364
       },
       "isLocked": false,
       "linkedName": null
@@ -48,12 +48,12 @@
     },
     {
       "anchor": {
-        "x": 1.516019971469329,
-        "y": 5.154194008559203
+        "x": 2.9392724679029953,
+        "y": 4.403751783166904
       },
       "prevControl": {
-        "x": 1.298959185938214,
-        "y": 5.278228743148411
+        "x": 2.72221168237188,
+        "y": 4.5277865177561125
       },
       "nextControl": null,
       "isLocked": false,
@@ -92,8 +92,8 @@
   "eventMarkers": [
     {
       "name": "TrigIntake",
-      "waypointRelativePos": 1.0363915940543313,
-      "endWaypointRelativePos": 2.5925166581240497,
+      "waypointRelativePos": 0.8518708354689728,
+      "endWaypointRelativePos": 2.4387493593029186,
       "command": null
     }
   ],
@@ -107,13 +107,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -22.83365417791758
+    "rotation": -12.28095440509935
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -40.55261514990951
+    "rotation": -80.0222873798494
   },
   "useDefaultConstraints": false
 }

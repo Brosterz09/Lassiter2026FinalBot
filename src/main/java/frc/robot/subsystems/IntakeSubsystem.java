@@ -29,6 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final TalonFXConfiguration m_armConfig;
   public boolean Intaking = false;
   public boolean ReverseIntaking = false;
+  public double targetSpeed = 40;
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
       TalonFXConfiguration config = new TalonFXConfiguration();
@@ -129,14 +130,28 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command RunIntake() {
     return run(
       () -> {
-        setIntakeVelocity(-40);
+        setIntakeVelocity(-targetSpeed);
       }
     ).finallyDo(interrupted -> stopIntake());
   }
+  public Command SpeedIncrease() {
+    return runOnce(
+      () -> {
+        targetSpeed = targetSpeed * 1.1;
+        System.out.println(-targetSpeed);
+      }
+    );}
+  public Command SpeedDecrease() {
+    return runOnce(
+      () -> {
+        targetSpeed = targetSpeed / 1.1;
+        System.out.println(-targetSpeed);
+      }
+    );}
   public Command RunIntakeReverse() {
     return run(
       () -> {
-          setIntakeVelocity(100);
+          setIntakeVelocity(75);
       }
     ).finallyDo(interrupted -> stopIntake());
   }

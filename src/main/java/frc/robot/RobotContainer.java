@@ -134,6 +134,8 @@ public class RobotContainer {
         joystick2.y().onTrue(m_shooterSubsystem.velocityDecrease());
         joystick2.a().onTrue(m_IndexSubsystem.velocityIncrease());
         joystick2.b().onTrue(m_IndexSubsystem.velocityDecrease());
+        joystick2.rightTrigger().onTrue(m_IntakeSubsystem.SpeedIncrease());
+        joystick2.leftTrigger().onTrue(m_IntakeSubsystem.SpeedDecrease());
         joystick2.leftBumper().onTrue(m_shooterSubsystem.velocityReset());
         joystick2.rightBumper().onTrue(m_IndexSubsystem.velocityReset());
         // joystick.rightBumper().onTrue(drivetrain.CenterBot(drive, MaxAngularRate));
@@ -169,7 +171,7 @@ public class RobotContainer {
             // Briefly lock wheels in X-pattern so steer motors reach their initial
             // path heading before the drive motors spin up, preventing the auto-start lurch.
             drivetrain.applyRequest(() -> brake).withTimeout(0.25),
-            AutoBuilder.buildAuto("empty"));
+            AutoBuilder.buildAuto("DepotAuto"));
         // return m_HangSubsystem.AutoHangBot();
         // Commands.waitSeconds(.4),
 
