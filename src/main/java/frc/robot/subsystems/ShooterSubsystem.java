@@ -24,7 +24,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class ShooterSubsystem extends SubsystemBase {
   private Supplier<Pose2d> m_poseSupplier;
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
-  private final double TARGET_RPS = 60.0;
+  private final double TARGET_RPS = 63.0;
   public Translation2d blueHubPosition = new Translation2d(4.625, 3.775);
   public Translation2d redHubPosition = new Translation2d(11.915,3.775);
   private double m_targetRPS = TARGET_RPS;
@@ -62,6 +62,7 @@ public class ShooterSubsystem extends SubsystemBase {
             ? blueHub : redHub;
         double distance = poseSupplier.get().getTranslation().getDistance(hub);
         getSpeedForDistance(distance);
+        System.out.println(distance);
         setShooterVelocity(speed);
     }).finallyDo(interrupted -> endMove());
 }
@@ -108,7 +109,7 @@ public class ShooterSubsystem extends SubsystemBase {
             setShooterVelocity(m_targetRPS*1.6);
         }).finallyDo(interrupted->endMove());
       }
-      
+
   public Command AutoJustShoot() {
     return runEnd(
         () -> {
