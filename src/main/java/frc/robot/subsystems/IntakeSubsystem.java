@@ -14,6 +14,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
@@ -52,6 +53,8 @@ public class IntakeSubsystem extends SubsystemBase {
       m_armConfig.Slot0.kD = 0;
       m_armConfig.Slot0.kV = 3.6;
       m_armConfig.Slot0.kS = 0.3;
+      m_armConfig.Slot0.kG = -4.0;
+      m_armConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
       m_armConfig.MotionMagic.MotionMagicCruiseVelocity = 2;
       m_armConfig.MotionMagic.MotionMagicAcceleration = 4;
       m_armConfig.Slot1.kP = .3;

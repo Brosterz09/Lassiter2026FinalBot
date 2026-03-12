@@ -279,10 +279,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        // Feed gyro heading to Limelights for MegaTag2
+        // Feed gyro heading and yaw rate to Limelights for MegaTag2
         double yaw = getState().Pose.getRotation().getDegrees();
-        LimelightHelpers.SetRobotOrientation("limelight-front", yaw, 0, 0, 0, 0, 0);
-        LimelightHelpers.SetRobotOrientation("limelight-back", yaw, 0, 0, 0, 0, 0);
+        double yawRateDegPerSec = Math.toDegrees(getState().Speeds.omegaRadiansPerSecond);
+        LimelightHelpers.SetRobotOrientation("limelight-front", yaw, yawRateDegPerSec, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-back", yaw, yawRateDegPerSec, 0, 0, 0, 0);
 
         updateVisionFromCamera("limelight-front");
         updateVisionFromCamera("limelight-back");
@@ -371,7 +372,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (mt2 == null || mt2.tagCount == 0) return;
 
         // Reject measurements during fast rotation (MegaTag2 is unreliable)
-        if (Math.abs(getState().Speeds.omegaRadiansPerSecond) > Math.toRadians(720)) return;
+        if (Math.abs(getState().Speeds.omegaRadiansPerSecond) > Math.toRadians(360)) return;
 
         // Reject poses outside field boundaries
         if (mt2.pose.getX() < 0 || mt2.pose.getX() > 16.5
