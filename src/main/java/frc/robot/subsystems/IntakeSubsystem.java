@@ -25,6 +25,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionVoltage = new PositionVoltage(0);
+  private final MotionMagicVoltage m_motionMagicArm = new MotionMagicVoltage(0);
   private final double ARM_DOWN_POSITION = 6.7;
   private final double ARM_UP_POSITION = -1.25;
 
@@ -50,7 +51,9 @@ public class IntakeSubsystem extends SubsystemBase {
       m_armConfig.Slot0.kI = 0;
       m_armConfig.Slot0.kD = 0;
       m_armConfig.Slot0.kV = 3.6;
-      m_armConfig.Slot0.kS = 8;
+      m_armConfig.Slot0.kS = 0.3;
+      m_armConfig.MotionMagic.MotionMagicCruiseVelocity = 2;
+      m_armConfig.MotionMagic.MotionMagicAcceleration = 4;
       m_armConfig.Slot1.kP = .3;
       m_armConfig.Slot1.kI = 0;
       m_armConfig.Slot1.kD = 0.1;
@@ -96,7 +99,7 @@ public class IntakeSubsystem extends SubsystemBase {
     public Command SetIntakeArmDown() {
     return run(
       () -> {
-        IntakeArmMotor.setControl(m_positionVoltage.withPosition(ARM_DOWN_POSITION).withSlot(1));
+        IntakeArmMotor.setControl(m_motionMagicArm.withPosition(ARM_DOWN_POSITION).withSlot(1));
       }).finallyDo(Interrupted -> stopIntake());
     }
         // () -> {
@@ -107,7 +110,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command SetIntakeArmUp() {
     return run(
       () -> {
-        IntakeArmMotor.setControl(m_positionVoltage.withPosition(ARM_UP_POSITION).withSlot(0));
+        IntakeArmMotor.setControl(m_motionMagicArm.withPosition(ARM_UP_POSITION).withSlot(0));
       }).finallyDo(Interrupted -> stopIntake());
     }
 
