@@ -55,14 +55,14 @@ public class IntakeSubsystem extends SubsystemBase {
       m_armConfig.Slot0.kS = 0.3;
       m_armConfig.Slot0.kG = -4.0;
       m_armConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-      m_armConfig.MotionMagic.MotionMagicCruiseVelocity = 2;
-      m_armConfig.MotionMagic.MotionMagicAcceleration = 4;
+      m_armConfig.MotionMagic.MotionMagicCruiseVelocity = 80;
+      m_armConfig.MotionMagic.MotionMagicAcceleration = 160;
       m_armConfig.Slot1.kP = .3;
       m_armConfig.Slot1.kI = 0;
       m_armConfig.Slot1.kD = 0.1;
       m_armConfig.Slot1.kV = 1.5;
       m_armConfig.Slot1.kS = 0;
-      m_armConfig.CurrentLimits.StatorCurrentLimit = 30;
+      m_armConfig.CurrentLimits.StatorCurrentLimit = 60;
       m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       m_armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;

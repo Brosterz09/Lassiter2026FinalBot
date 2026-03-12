@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
+import frc.robot.LimelightHelpers;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.HangSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
@@ -165,8 +166,27 @@ public class RobotContainer {
         // joystick.start().and(joystick.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
-        // Reset the field-centric heading on start button press.
-        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        // Re-apply alliance-correct operator perspective on start button press.
+        // seedFieldCentric() is NOT used here because it resets the pose heading to 0°
+        // and ignores the alliance perspective, causing controls to flip or pose to be wrong
+        // depending on which direction the robot faces when pressed.
+        joystick.start().onTrue(drivetrain.runOnce(drivetrain::resetAlliancePerspective));
+
+        // Reset pose from vision on select (back) button press.
+        // Tries limelight-front first, falls back to limelight-back, no-ops if no targets.
+        joystick.back().onTrue(Commands.runOnce(() -> {
+            if (LimelightHelpers.getTV("limelight-front")) {
+                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
+                drivetrain.resetPose(visionPose);
+                System.out.println("Pose reset from front camera: " + visionPose);
+            } else if (LimelightHelpers.getTV("limelight-back")) {
+                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
+                drivetrain.resetPose(visionPose);
+                System.out.println("Pose reset from back camera: " + visionPose);
+            } else {
+                System.out.println("WARNING: No vision targets seen, pose not reset");
+            }
+        }, drivetrain));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

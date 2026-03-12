@@ -259,6 +259,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
+    /**
+     * Re-applies the alliance-correct operator perspective forward direction.
+     * Use this for the "heading reset" button instead of seedFieldCentric().
+     * seedFieldCentric() resets the pose heading to 0° and overrides the alliance
+     * perspective, causing controls to be reversed or the pose to be wrong depending
+     * on which direction the robot faces when the button is pressed.
+     */
+    public void resetAlliancePerspective() {
+        DriverStation.getAlliance().ifPresent(allianceColor -> {
+            setOperatorPerspectiveForward(
+                allianceColor == Alliance.Red
+                    ? kRedAlliancePerspectiveRotation
+                    : kBlueAlliancePerspectiveRotation
+            );
+        });
+    }
+
     @Override
     public void periodic() {
         /*
