@@ -88,6 +88,8 @@ public class TunerConstants {
     private static final Pigeon2Configuration pigeonConfigs = new Pigeon2Configuration()
     .withMountPose(new MountPoseConfigs()
         .withMountPoseYaw(0)
+        .withMountPoseRoll(180)
+        .withMountPosePitch(0)
     );
     // new Pigeon2Configuration()
     // .withMountPose(new MountPoseConfigs()

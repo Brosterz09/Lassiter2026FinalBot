@@ -69,8 +69,8 @@ public class RobotContainer {
         );
         LimelightHelpers.setCameraPose_RobotSpace(
     "limelight-back",
-    -0.328, -0.254, 0.51,
-    180.0, 0.0, 180.0
+    -0.328, -0.254, 0.35,
+    180.0, 0, 180.0
         );
         drivetrain.configureAutoBuilder();
     
@@ -83,8 +83,8 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                drive.withVelocityX(joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
                     .withRotationalRate(joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
@@ -145,7 +145,6 @@ public class RobotContainer {
         joystick2.leftBumper().onTrue(m_shooterSubsystem.velocityReset());
         joystick2.rightBumper().onTrue(m_IndexSubsystem.velocityReset());
         // joystick.rightBumper().onTrue(drivetrain.CenterBot(drive, MaxAngularRate));
-
 
         // Idle while the robot is disabled. This ensures the configured
         // neutral mode is applied to the drive motors while disabled.
