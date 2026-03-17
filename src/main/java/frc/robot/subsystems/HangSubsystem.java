@@ -18,7 +18,7 @@ public class HangSubsystem extends SubsystemBase {
   @SuppressWarnings("removal")
   public HangSubsystem() {
     SparkMaxConfig config = new SparkMaxConfig();
-    config.smartCurrentLimit(30);
+    config.smartCurrentLimit(60);
     config.idleMode(IdleMode.kBrake);
     HangMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
@@ -28,7 +28,7 @@ public class HangSubsystem extends SubsystemBase {
     return run(
         () -> {
             // double currentPos = HangMotor.getRelativeEncoder();
-            HangMotor.set(.25);
+            HangMotor.set(1);
          }
     ).finallyDo(interrupted->HangMotor.set(0));
 }
@@ -36,7 +36,7 @@ public class HangSubsystem extends SubsystemBase {
   public Command HangRobotDown() {
     return run(
         () -> {
-            HangMotor.set(-.25);
+            HangMotor.set(-1);
          }
     ).finallyDo(interrupted->HangMotor.set(0));
 }

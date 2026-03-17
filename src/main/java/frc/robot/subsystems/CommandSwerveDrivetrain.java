@@ -385,7 +385,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private void updateVisionFromCamera(String cameraName) {
         LimelightHelpers.PoseEstimate mt2 =
             LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
-        System.out.println(mt2);
         if (mt2 == null || mt2.tagCount == 0) return;
 
         // Reject measurements during fast rotation (MegaTag2 is unreliable)
@@ -398,10 +397,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // Set theta std dev to effectively infinite -- never correct heading from vision
         if (mt2.tagCount >= 2) {
             addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
-                VecBuilder.fill(0.5, 0.5, 9999999));
+                VecBuilder.fill(0.5, 0.5, .5));
         } else {
             addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
-                VecBuilder.fill(1.0, 1.0, 9999999));
+                VecBuilder.fill(1.0, 1.0, 1));
         }
     }
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
@@ -423,7 +422,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         setControl(drive
             .withVelocityX(vx.get())
             .withVelocityY(vy.get())
-            .withRotationalRate(-rotationSpeed)
+            .withRotationalRate(rotationSpeed)
         );
     });
 }
@@ -444,7 +443,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         setControl(drive
             .withVelocityX(vx.get())
             .withVelocityY(vy.get())
-            .withRotationalRate(-rotationSpeed)
+            .withRotationalRate(rotationSpeed)
         );
     });
 }

@@ -83,9 +83,9 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
             drivetrain.applyRequest(() ->
-                drive.withVelocityX(joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                drive.withVelocityX(-joystick.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
+                    .withVelocityY(-joystick.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                    .withRotationalRate(-joystick.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
         joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
@@ -94,6 +94,7 @@ public class RobotContainer {
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
         joystick.b().onTrue(m_IntakeSubsystem.SetIntakeArmDown());
         joystick.a().onTrue(m_IntakeSubsystem.SetIntakeArmUp());
+        joystick.povLeft().whileTrue(m_IndexSubsystem.RunSpindexerWOShooter());
         joystick.povRight().whileTrue(
             Commands.parallel(
                 m_shooterSubsystem.CrackCocaineShooter(),
@@ -115,8 +116,8 @@ public class RobotContainer {
             Commands.parallel(
                 drivetrain.aimAtHub(
                     drive,
-                    () ->  joystick.getLeftY() * MaxSpeed,
-                    () ->  joystick.getLeftX() * MaxSpeed,
+                    () ->  -joystick.getLeftY() * MaxSpeed,
+                    () ->  -joystick.getLeftX() * MaxSpeed,
                     MaxAngularRate
                 ),
                 m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
@@ -127,8 +128,8 @@ public class RobotContainer {
             Commands.parallel(
                 drivetrain.aimAtAllianceSide(
                     drive,
-                    () ->  joystick.getLeftY() * MaxSpeed,
-                    () ->  joystick.getLeftX() * MaxSpeed,
+                    () ->  -joystick.getLeftY() * MaxSpeed,
+                    () ->  -joystick.getLeftX() * MaxSpeed,
                     MaxAngularRate
                 ),
                 m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
@@ -153,7 +154,7 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
-        joystick.povLeft().whileTrue(drivetrain.applyRequest(() -> brake));
+        // joystick.povLeft().whileTrue(drivetrain.applyRequest(() -> brake));
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
         // ));
@@ -169,23 +170,23 @@ public class RobotContainer {
         // seedFieldCentric() is NOT used here because it resets the pose heading to 0°
         // and ignores the alliance perspective, causing controls to flip or pose to be wrong
         // depending on which direction the robot faces when pressed.
-        joystick.start().onTrue(drivetrain.runOnce(drivetrain::resetAlliancePerspective));
+        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         // Reset pose from vision on select (back) button press.
         // Tries limelight-front first, falls back to limelight-back, no-ops if no targets.
-        joystick.back().onTrue(Commands.runOnce(() -> {
-            if (LimelightHelpers.getTV("limelight-front")) {
-                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
-                drivetrain.resetPose(visionPose);
-                System.out.println("Pose reset from front camera: " + visionPose);
-            } else if (LimelightHelpers.getTV("limelight-back")) {
-                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
-                drivetrain.resetPose(visionPose);
-                System.out.println("Pose reset from back camera: " + visionPose);
-            } else {
-                System.out.println("WARNING: No vision targets seen, pose not reset");
-            }
-        }, drivetrain));
+    //     joystick.back().onTrue(Commands.runOnce(() -> {
+    //         if (LimelightHelpers.getTV("limelight-front")) {
+    //             Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
+    //             drivetrain.resetPose(visionPose);
+    //             System.out.println("Pose reset from front camera: " + visionPose);
+    //         } else if (LimelightHelpers.getTV("limelight-back")) {
+    //             Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
+    //             drivetrain.resetPose(visionPose);
+    //             System.out.println("Pose reset from back camera: " + visionPose);
+    //         } else {
+    //             System.out.println("WARNING: No vision targets seen, pose not reset");
+    //         }
+    //     }, drivetrain));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }
@@ -195,7 +196,7 @@ public class RobotContainer {
             // Briefly lock wheels in X-pattern so steer motors reach their initial
             // path heading before the drive motors spin up, preventing the auto-start lurch.
             drivetrain.applyRequest(() -> brake).withTimeout(0.25),
-            AutoBuilder.buildAuto("DepotAuto"));
+            AutoBuilder.buildAuto("CenterAuto"));
         // return m_HangSubsystem.AutoHangBot();
         // Commands.waitSeconds(.4),
 

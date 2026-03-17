@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import javax.sound.sampled.SourceDataLine;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
@@ -33,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final TalonFXConfiguration m_armConfig;
   public boolean Intaking = false;
   public boolean ReverseIntaking = false;
-  public double targetSpeed = 40;
+  public double targetSpeed = 80;
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
       TalonFXConfiguration config = new TalonFXConfiguration();
@@ -60,10 +61,10 @@ public class IntakeSubsystem extends SubsystemBase {
       m_armConfig.Slot1.kP = .15;
       m_armConfig.Slot1.kI = 0;
       m_armConfig.Slot1.kD = 0.1;
-      m_armConfig.Slot1.kV = .2;
+      m_armConfig.Slot1.kV = .1;
       m_armConfig.Slot1.kS = 0;
       m_armConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
-      m_armConfig.CurrentLimits.StatorCurrentLimit = 60;
+      m_armConfig.CurrentLimits.StatorCurrentLimit = 40;
       m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       m_armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -137,6 +138,7 @@ public class IntakeSubsystem extends SubsystemBase {
     return run(
       () -> {
         setIntakeVelocity(-targetSpeed);
+        System.out.println(IntakeArmMotor.getVelocity());
       }
     ).finallyDo(interrupted -> stopIntake());
   }
@@ -144,14 +146,14 @@ public class IntakeSubsystem extends SubsystemBase {
     return runOnce(
       () -> {
         targetSpeed = targetSpeed * 1.1;
-        System.out.println(-targetSpeed);
+        System.out.println(targetSpeed);
       }
     );}
   public Command SpeedDecrease() {
     return runOnce(
       () -> {
         targetSpeed = targetSpeed / 1.1;
-        System.out.println(-targetSpeed);
+        System.out.println(targetSpeed);
       }
     );}
   public Command RunIntakeReverse() {
@@ -164,7 +166,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoRunIntake() {
     return runEnd(
-        () -> setIntakeVelocity(-60),
+        () -> setIntakeVelocity(60),
         () -> endIntakeMove()
         ).withTimeout(5);
       }

@@ -24,7 +24,8 @@ import edu.wpi.first.math.geometry.Translation2d;
 public class ShooterSubsystem extends SubsystemBase {
   private Supplier<Pose2d> m_poseSupplier;
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
-  private final double TARGET_RPS = 63.0;
+  //private final double TARGET_RPS = 56.0;
+  private final double TARGET_RPS = 56.0;
   public Translation2d blueHubPosition = new Translation2d(4.625, 3.775);
   public Translation2d redHubPosition = new Translation2d(11.915,3.775);
   private double m_targetRPS = TARGET_RPS;
@@ -90,12 +91,13 @@ public class ShooterSubsystem extends SubsystemBase {
 }
 
   public void getSpeedForDistance(double distanceMeters) {
-    double KP = 12;
-    speed =  distanceMeters*KP + 40;
+    double KP = 10;
+    speed =  distanceMeters*KP + 20
+    ;
   }
 
   public boolean atSpeed() {
-    return getShooterVelocity() >= .9 * m_targetRPS;
+    return getShooterVelocity() >= .95 * m_targetRPS;
   }
   public Command JustShoot() {
     return run(
@@ -106,7 +108,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command CrackCocaineShooter() {
     return run(
         () -> {
-            setShooterVelocity(m_targetRPS*1.6);
+            setShooterVelocity(m_targetRPS*1.2);
         }).finallyDo(interrupted->endMove());
       }
 
@@ -120,7 +122,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command ReverseShooter() {
     return run(
         () -> {
-            setShooterVelocity(-100);
+            setShooterVelocity(-70);
         }).finallyDo(interrupted->endMove());
       }
 
