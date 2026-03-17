@@ -397,10 +397,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // Set theta std dev to effectively infinite -- never correct heading from vision
         if (mt2.tagCount >= 2) {
             addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
-                VecBuilder.fill(0.5, 0.5, .5));
+                VecBuilder.fill(0.5, 0.5, 9999));
         } else {
             addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
-                VecBuilder.fill(1.0, 1.0, 1));
+                VecBuilder.fill(1.0, 1.0, 99999));
         }
     }
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {

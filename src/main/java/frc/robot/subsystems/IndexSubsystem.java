@@ -17,7 +17,7 @@ public class IndexSubsystem extends SubsystemBase {
   TalonFX Indexer = new TalonFX(17);
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
 
-  private final double TARGET_RPS = -90;
+  private final double TARGET_RPS = -100;
   private double m_targetRPS = TARGET_RPS;
   private ShooterSubsystem m_shooter;
   public IndexSubsystem(ShooterSubsystem shooter) {
