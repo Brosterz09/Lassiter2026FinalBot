@@ -196,28 +196,9 @@ public class RobotContainer {
             // Briefly lock wheels in X-pattern so steer motors reach their initial
             // path heading before the drive motors spin up, preventing the auto-start lurch.
             drivetrain.applyRequest(() -> brake).withTimeout(0.25),
-            AutoBuilder.buildAuto("CenterAuto"));
-        // return m_HangSubsystem.AutoHangBot();
-        // Commands.waitSeconds(.4),
-
-        // Commands.runOnce(() -> {
-        //     if (LimelightHelpers.getTV("limelight-front")) {
-        //         Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
-        //         drivetrain.resetPose(visionPose);
-        //         System.out.println("Pose reset to: " + visionPose);
-        //     } else if (LimelightHelpers.getTV("limelight-back")) {
-        //         Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
-        //         drivetrain.resetPose(visionPose);
-        //         System.out.println("Pose reset from back camera: " + visionPose);
-        //     } else {
-        //         System.out.println("WARNING: No vision targets seen, using odometry pose");
-        //     }
-        // }),
-       
-        //Other Testing Autos
-        // AutoBuilder.buildAuto("ExperimentalFinalAuto"); 
-        // AutoBuilder.buildAuto("PrimeAuto");
-        // AutoBuilder.buildAuto("PrimeAuto");
+            AutoBuilder.buildAuto("CenterAutoRIGHT"));
+            //AutoBuilder.buildAuto("TestAuto"));/
+            //AutoBuilder.buildAuto("CenterAutoLEFT"));
     }
 }
 
