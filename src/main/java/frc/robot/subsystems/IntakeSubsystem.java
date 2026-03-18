@@ -34,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final TalonFXConfiguration m_armConfig;
   public boolean Intaking = false;
   public boolean ReverseIntaking = false;
-  public double targetSpeed = 80;
+  public double targetSpeed = 70;
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
       TalonFXConfiguration config = new TalonFXConfiguration();
