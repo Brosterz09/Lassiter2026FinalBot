@@ -16,6 +16,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
@@ -42,6 +44,7 @@ public class RobotContainer {
 
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    private final PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController joystick2 = new CommandXboxController(1);
     public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(() -> drivetrain.getState().Pose);
@@ -154,6 +157,9 @@ public class RobotContainer {
             drivetrain.applyRequest(() -> idle).ignoringDisable(true)
         );
 
+        // Keep the PDH switchable channel (ch 23) always on.
+        pdh.setSwitchableChannel(true);
+
         // joystick.povLeft().whileTrue(drivetrain.applyRequest(() -> brake));
         // joystick.b().whileTrue(drivetrain.applyRequest(() ->
         //     point.withModuleDirection(new Rotation2d(-joystick.getLeftY(), -joystick.getLeftX()))
@@ -196,7 +202,7 @@ public class RobotContainer {
             // Briefly lock wheels in X-pattern so steer motors reach their initial
             // path heading before the drive motors spin up, preventing the auto-start lurch.
             drivetrain.applyRequest(() -> brake).withTimeout(0.25),
-            AutoBuilder.buildAuto("CenterAutoRIGHT"));
+            AutoBuilder.buildAuto("empty"));
             //AutoBuilder.buildAuto("TestAuto"));/
             //AutoBuilder.buildAuto("CenterAutoLEFT"));
     }
