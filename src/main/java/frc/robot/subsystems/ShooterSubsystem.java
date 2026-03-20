@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -188,6 +189,14 @@ public class ShooterSubsystem extends SubsystemBase {
             ? blueHubPosition : redHubPosition;
         double distance = m_poseSupplier.get().getTranslation().getDistance(hub);
       SmartDashboard.putNumber("DistanceToHub", distance);
+    double velocity = getShooterVelocity();
+    SmartDashboard.putNumber("ShooterVelocity", velocity);
+    SmartDashboard.putBoolean("ShooterAtSpeed", atSpeed());
+    SmartDashboard.putBoolean("ShooterReachedSpeed", m_reachedSpeed);
+    SignalLogger.writeDouble("Shooter/VelocityRPS", velocity, "rotations per second");
+    SignalLogger.writeDouble("Shooter/TargetRPS", m_targetRPS, "rotations per second");
+    SignalLogger.writeBoolean("Shooter/AtSpeed", atSpeed());
+    SignalLogger.writeBoolean("Shooter/ReachedSpeed", m_reachedSpeed);
   }
 
   @Override
