@@ -406,21 +406,39 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     /**
      * Attempts to hard-reset the robot pose from the best available Limelight.
-     * Tries limelight-front first, then limelight-back. Requires at least one
-     * visible AprilTag. Returns true if the pose was successfully seeded.
+     *
+     * Uses MegaTag1 (SolvePNP), which computes the full pose — including heading —
+     * purely from AprilTag geometry without relying on the gyro. This is important
+     * at match start because the gyro was zeroed when the robot powered on in its
+     * forward-facing position, then the robot was staged (potentially at a different
+     * heading). MegaTag2 would reuse that boot-time gyro heading; MegaTag1 does not.
+     *
+     * Both cameras are checked; the one seeing more tags is preferred (fewer tags
+     * increases SolvePNP ambiguity). Returns true if the pose was successfully seeded.
      */
     public boolean seedPoseFromVision() {
+        LimelightHelpers.PoseEstimate bestEstimate = null;
+        String bestCamera = null;
+
         for (String camera : new String[]{"limelight-front", "limelight-back"}) {
-            LimelightHelpers.PoseEstimate mt2 =
-                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
-            if (mt2 == null || mt2.tagCount == 0) continue;
-            if (mt2.pose.getX() < 0 || mt2.pose.getX() > 16.5
-                || mt2.pose.getY() < 0 || mt2.pose.getY() > 8.2) continue;
-            resetPose(mt2.pose);
-            System.out.println("Pose seeded from " + camera + ": " + mt2.pose);
-            return true;
+            LimelightHelpers.PoseEstimate mt1 =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
+            if (mt1 == null || mt1.tagCount == 0) continue;
+            if (mt1.pose.getX() < 0 || mt1.pose.getX() > 16.5
+                || mt1.pose.getY() < 0 || mt1.pose.getY() > 8.2) continue;
+            // Prefer the camera with more visible tags (less ambiguous heading solve)
+            if (bestEstimate == null || mt1.tagCount > bestEstimate.tagCount) {
+                bestEstimate = mt1;
+                bestCamera = camera;
+            }
         }
-        return false;
+
+        if (bestEstimate == null) return false;
+
+        resetPose(bestEstimate.pose);
+        System.out.println("Pose seeded from " + bestCamera + " (MegaTag1, "
+            + bestEstimate.tagCount + " tag(s)): " + bestEstimate.pose);
+        return true;
     }
 
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
