@@ -196,7 +196,7 @@ public class RobotContainer {
             // Briefly lock wheels in X-pattern so steer motors reach their initial
             // path heading before the drive motors spin up, preventing the auto-start lurch.
             drivetrain.applyRequest(() -> brake).withTimeout(0.25),
-            AutoBuilder.buildAuto("CenterAutoRIGHT"));
+            AutoBuilder.buildAuto("empty"));
             //AutoBuilder.buildAuto("TestAuto"));/
             //AutoBuilder.buildAuto("CenterAutoLEFT"));
     }

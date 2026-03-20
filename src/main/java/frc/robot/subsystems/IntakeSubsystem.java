@@ -43,7 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
       config.Slot0.kD = 0;
       config.Slot0.kV = 0.098;
       config.Slot0.kS = 0.0;
-      config.CurrentLimits.StatorCurrentLimit = 45;
+      config.CurrentLimits.StatorCurrentLimit = 30;
       config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;

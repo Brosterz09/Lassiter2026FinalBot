@@ -25,7 +25,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private Supplier<Pose2d> m_poseSupplier;
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
-  private final double TARGET_RPS = 56.0;
+  private final double TARGET_RPS = 51;
   public Translation2d blueHubPosition = new Translation2d(4.625, 3.775);
   public Translation2d redHubPosition = new Translation2d(11.915,3.775);
   private double m_targetRPS = TARGET_RPS;
@@ -37,7 +37,7 @@ public class ShooterSubsystem extends SubsystemBase {
   config.Slot0.kD = 0;
   config.Slot0.kV = 0.126;
   config.Slot0.kS = 0.0;
-  config.CurrentLimits.StatorCurrentLimit = 60;
+  config.CurrentLimits.StatorCurrentLimit = 40;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
   config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
   config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -97,7 +97,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public boolean atSpeed() {
-    return getShooterVelocity() >= .95 * m_targetRPS;
+    return getShooterVelocity() >= .98 * m_targetRPS;
   }
   public Command JustShoot() {
     return run(
