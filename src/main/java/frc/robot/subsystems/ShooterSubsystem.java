@@ -25,7 +25,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private Supplier<Pose2d> m_poseSupplier;
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
-  private final double TARGET_RPS = 51;
+  private final double TARGET_RPS = 54.5;
   public Translation2d blueHubPosition = new Translation2d(4.625, 4.025);
   public Translation2d redHubPosition = new Translation2d(11.913, 4.025);
 
@@ -104,7 +104,7 @@ public class ShooterSubsystem extends SubsystemBase {
     speed =  distanceMeters*KP + 20
     ;
   }
-
+  
   public boolean atSpeed() {
     return getShooterVelocity() >= .98 * m_targetRPS;
   }
@@ -126,7 +126,7 @@ public class ShooterSubsystem extends SubsystemBase {
         () -> {
             setShooterVelocity(m_targetRPS);
         },
-        () -> setShooterVelocity(0)).withTimeout(7.0);
+        () -> setShooterVelocity(0)).withTimeout(9.0);
       }
   public Command ReverseShooter() {
     return run(

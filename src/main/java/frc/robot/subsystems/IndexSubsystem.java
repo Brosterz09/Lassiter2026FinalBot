@@ -71,7 +71,7 @@ public class IndexSubsystem extends SubsystemBase {
             setIndexerVelocity(0);
           }
         },
-        () -> setIndexerVelocity(0)).withTimeout(7);
+        () -> setIndexerVelocity(0)).withTimeout(9.0);
   }
    
   public void setIndexerVelocity(double targetRPS){
