@@ -26,8 +26,17 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
   private final double TARGET_RPS = 51;
-  public Translation2d blueHubPosition = new Translation2d(4.625, 3.775);
-  public Translation2d redHubPosition = new Translation2d(11.915,3.775);
+  public Translation2d blueHubPosition = new Translation2d(4.625, 4.025);
+  public Translation2d redHubPosition = new Translation2d(11.913, 4.025);
+
+  // Offset of the shooter (under limelight-front) from the robot center, in robot-relative coords.
+  // Forward = +x, left = +y in WPILib convention.
+  private static final Translation2d kShooterOffset = new Translation2d(0.15748, -0.1353312);
+
+  /** Returns the shooter's position in field coordinates given the current robot pose. */
+  private static Translation2d shooterFieldPosition(Pose2d pose) {
+    return pose.getTranslation().plus(kShooterOffset.rotateBy(pose.getRotation()));
+  }
   private double m_targetRPS = TARGET_RPS;
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
   m_poseSupplier = poseSupplier;
@@ -56,12 +65,12 @@ public class ShooterSubsystem extends SubsystemBase {
    * @return a command
    */
   public Command MoveShooterWithDistance(Supplier<Pose2d> poseSupplier) {
-    Translation2d blueHub = new Translation2d(4.625, 3.775);
-    Translation2d redHub = new Translation2d(11.915, 3.775);
+    Translation2d blueHub = new Translation2d(4.625, 4.025);
+    Translation2d redHub = new Translation2d(11.913, 4.025);
     return run(() -> {
         Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
             ? blueHub : redHub;
-        double distance = poseSupplier.get().getTranslation().getDistance(hub);
+        double distance = shooterFieldPosition(poseSupplier.get()).getDistance(hub);
         getSpeedForDistance(distance);
         System.out.println(distance);
         setShooterVelocity(speed);
@@ -74,7 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
         () -> {
             Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
                 ? blueHubPosition : redHubPosition;
-            double distance = poseSupplier.get().getTranslation().getDistance(hub);
+            double distance = shooterFieldPosition(poseSupplier.get()).getDistance(hub);
             getSpeedForDistance(distance);
             setShooterVelocity(speed);
         },

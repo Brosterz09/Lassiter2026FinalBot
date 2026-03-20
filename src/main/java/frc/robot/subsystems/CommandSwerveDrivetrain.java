@@ -404,8 +404,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
-    Translation2d blueHub = new Translation2d(5.475, 4.375);
-    Translation2d redHub = new Translation2d(12.45, 4.225);
+    Translation2d blueHub = new Translation2d(4.625, 4.025);
+    Translation2d redHub = new Translation2d(11.913, 4.025);
 
     return run(() -> {
         Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
