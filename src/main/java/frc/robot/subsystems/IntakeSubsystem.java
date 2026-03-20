@@ -29,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionVoltage = new PositionVoltage(0);
   private final MotionMagicVoltage m_motionMagicArm = new MotionMagicVoltage(0);
-  private final double ARM_DOWN_POSITION = 7.3;
+  private final double ARM_DOWN_POSITION = 6.7;
   private final double ARM_UP_POSITION = 0;
 
   private final TalonFXConfiguration m_armConfig;
