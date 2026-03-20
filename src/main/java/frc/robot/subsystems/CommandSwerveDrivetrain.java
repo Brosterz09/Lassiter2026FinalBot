@@ -403,6 +403,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 VecBuilder.fill(1.0, 1.0, 99999));
         }
     }
+
+    /**
+     * Attempts to hard-reset the robot pose from the best available Limelight.
+     * Tries limelight-front first, then limelight-back. Requires at least one
+     * visible AprilTag. Returns true if the pose was successfully seeded.
+     */
+    public boolean seedPoseFromVision() {
+        for (String camera : new String[]{"limelight-front", "limelight-back"}) {
+            LimelightHelpers.PoseEstimate mt2 =
+                LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(camera);
+            if (mt2 == null || mt2.tagCount == 0) continue;
+            if (mt2.pose.getX() < 0 || mt2.pose.getX() > 16.5
+                || mt2.pose.getY() < 0 || mt2.pose.getY() > 8.2) continue;
+            resetPose(mt2.pose);
+            System.out.println("Pose seeded from " + camera + ": " + mt2.pose);
+            return true;
+        }
+        return false;
+    }
+
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
     Translation2d blueHub = new Translation2d(5.475, 4.375);
     Translation2d redHub = new Translation2d(12.45, 4.225);

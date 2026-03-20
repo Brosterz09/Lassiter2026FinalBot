@@ -34,13 +34,23 @@ public class Robot extends TimedRobot {
     public void disabledInit() {}
 
     @Override
-    public void disabledPeriodic() {}
+    public void disabledPeriodic() {
+        // Continuously seed pose from vision while disabled so that by the time
+        // auto starts the odometry already reflects the robot's true field position.
+        m_robotContainer.drivetrain.seedPoseFromVision();
+    }
 
     @Override
     public void disabledExit() {}
 
     @Override
     public void autonomousInit() {
+        // Final vision pose seed right before auto starts, in case the most recent
+        // disabled-period update was stale. resetOdom is disabled in the auto files
+        // so PathPlanner will not override this pose.
+        if (!m_robotContainer.drivetrain.seedPoseFromVision()) {
+            System.out.println("WARNING: No vision targets seen, starting pose not seeded from vision.");
+        }
         m_autonomousCommand = m_robotContainer.getAutonomousCommand();
         if (m_autonomousCommand != null) {
             m_autonomousCommand.schedule();
