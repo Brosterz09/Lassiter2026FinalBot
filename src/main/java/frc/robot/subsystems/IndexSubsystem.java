@@ -39,7 +39,7 @@ public class IndexSubsystem extends SubsystemBase {
   public Command RunSpindexer() {
     return run(
         () -> {
-          if (m_shooter.atSpeed()) {
+          if (m_shooter.reachedSpeed()) {
             setIndexerVelocity(m_targetRPS);
           } else {
             setIndexerVelocity(0);
@@ -65,7 +65,7 @@ public class IndexSubsystem extends SubsystemBase {
   public Command AutoRunSpindexer() {
     return runEnd(
         () -> {
-          if(m_shooter.atSpeed())
+          if(m_shooter.reachedSpeed())
             setIndexerVelocity(m_targetRPS);
           else {
             setIndexerVelocity(0);

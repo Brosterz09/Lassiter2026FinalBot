@@ -38,6 +38,7 @@ public class ShooterSubsystem extends SubsystemBase {
     return pose.getTranslation().plus(kShooterOffset.rotateBy(pose.getRotation()));
   }
   private double m_targetRPS = TARGET_RPS;
+  private boolean m_reachedSpeed = false;
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
   m_poseSupplier = poseSupplier;
   TalonFXConfiguration config = new TalonFXConfiguration();
@@ -107,6 +108,12 @@ public class ShooterSubsystem extends SubsystemBase {
   
   public boolean atSpeed() {
     return getShooterVelocity() >= .98 * m_targetRPS;
+  }
+
+  /** Latching speed flag: becomes true once up to speed, stays true until the shooter is stopped. */
+  public boolean reachedSpeed() {
+    if (atSpeed()) m_reachedSpeed = true;
+    return m_reachedSpeed;
   }
   public Command JustShoot() {
     return run(
@@ -188,6 +195,7 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
   public void endMove() {
+    m_reachedSpeed = false;
     stop();
   }
 }
