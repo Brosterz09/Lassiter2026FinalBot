@@ -40,17 +40,18 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   private boolean running = false;
   private boolean unJamRunning = false;
+  private boolean autoRunning = false;
   private double m_targetRPS = TARGET_RPS;
   private boolean m_reachedSpeed = false;
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
   m_poseSupplier = poseSupplier;
   TalonFXConfiguration config = new TalonFXConfiguration();
-  config.Slot0.kP = 0.12;
+  config.Slot0.kP = 0.5;
   config.Slot0.kI = 0;
   config.Slot0.kD = 0;
   config.Slot0.kV = 0.126;
   config.Slot0.kS = 0.0;
-  config.CurrentLimits.StatorCurrentLimit = 40;
+  config.CurrentLimits.StatorCurrentLimit = 100;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
   config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
   config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -97,7 +98,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command BackShots() {
     return runEnd(
         () -> {
-          setShooterVelocity(m_targetRPS);
+          setShooterVelocity(-m_targetRPS);
         },
         () -> endMove()
     ).withTimeout(.5);
@@ -136,8 +137,9 @@ public class ShooterSubsystem extends SubsystemBase {
     return runEnd(
         () -> {
             setShooterVelocity(m_targetRPS);
+            autoRunning = true;
         },
-        () -> setShooterVelocity(0)).withTimeout(9.0);
+        () -> endMove()).withTimeout(11.0);
       }
   public Command unJamShooter() {
     return run(
@@ -207,6 +209,9 @@ public class ShooterSubsystem extends SubsystemBase {
     else if(unJamRunning == true) {
 
     }
+    else if (autoRunning == true) {
+
+    }
     else {
       setShooterVelocity(20);
     }
@@ -220,6 +225,7 @@ public class ShooterSubsystem extends SubsystemBase {
     m_reachedSpeed = false;
     unJamRunning = false;
     running = false;
+    autoRunning = false;
     stop();
   }
 }
