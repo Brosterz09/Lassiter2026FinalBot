@@ -46,12 +46,12 @@ public class ShooterSubsystem extends SubsystemBase {
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
   m_poseSupplier = poseSupplier;
   TalonFXConfiguration config = new TalonFXConfiguration();
-  config.Slot0.kP = 0.12;
+  config.Slot0.kP = 0.5;
   config.Slot0.kI = 0;
   config.Slot0.kD = 0;
   config.Slot0.kV = 0.126;
   config.Slot0.kS = 0.0;
-  config.CurrentLimits.StatorCurrentLimit = 40;
+  config.CurrentLimits.StatorCurrentLimit = 100;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
   config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
   config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
