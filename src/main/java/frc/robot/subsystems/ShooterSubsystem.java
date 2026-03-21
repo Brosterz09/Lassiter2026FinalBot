@@ -98,7 +98,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command BackShots() {
     return runEnd(
         () -> {
-          setShooterVelocity(-m_targetRPS);
+          setShooterVelocity(m_targetRPS);
         },
         () -> endMove()
     ).withTimeout(.5);
@@ -136,10 +136,10 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command AutoJustShoot() {
     return runEnd(
         () -> {
-            setShooterVelocity(m_targetRPS);
             autoRunning = true;
+            setShooterVelocity(m_targetRPS);
         },
-        () -> endMove()).withTimeout(11.0);
+        () -> endMove()).withTimeout(9.0);
       }
   public Command unJamShooter() {
     return run(
@@ -224,8 +224,8 @@ public class ShooterSubsystem extends SubsystemBase {
   public void endMove() {
     m_reachedSpeed = false;
     unJamRunning = false;
-    running = false;
     autoRunning = false;
+    running = false;
     stop();
   }
 }
