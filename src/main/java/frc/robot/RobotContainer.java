@@ -111,7 +111,7 @@ public class RobotContainer {
             );
         joystick.y().whileTrue(
             Commands.parallel(
-                m_shooterSubsystem.ReverseShooter(),
+                m_shooterSubsystem.unJamShooter(),
                 m_IndexSubsystem.RunSpindexerReverse()
             )
             );
