@@ -98,39 +98,6 @@ public class RobotContainer {
         joystick.b().onTrue(m_IntakeSubsystem.SetIntakeArmDown());
         joystick.a().onTrue(m_IntakeSubsystem.SetIntakeArmUp());
         joystick.povLeft().whileTrue(m_IndexSubsystem.RunSpindexerWOShooter());
-<<<<<<< HEAD
-        // joystick.povRight().whileTrue(
-        //     Commands.parallel(
-        //         m_shooterSubsystem.CrackCocaineShooter(),
-        //         m_IndexSubsystem.RunSpindexer()
-        //     ));
-        joystick.x().whileTrue(m_IndexSubsystem.RunSpindexer());
-        joystick.y().whileTrue(m_IndexSubsystem.RunSpindexerReverse());
-        // joystick.rightTrigger().whileTrue(
-        //     Commands.parallel(
-        //         drivetrain.aimAtHub(
-        //             drive,
-        //             () ->  -joystick.getLeftY() * MaxSpeed,
-        //             () ->  -joystick.getLeftX() * MaxSpeed,
-        //             MaxAngularRate
-        //         ),
-        //         m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
-        //         m_IndexSubsystem.RunSpindexer()
-        //     )
-        // );
-        // joystick.rightBumper().whileTrue(
-        //     Commands.parallel(
-        //         drivetrain.aimAtAllianceSide(
-        //             drive,
-        //             () ->  -joystick.getLeftY() * MaxSpeed,
-        //             () ->  -joystick.getLeftX() * MaxSpeed,
-        //             MaxAngularRate
-        //         ),
-        //         m_shooterSubsystem.MoveShooterWithDistance(() -> drivetrain.getState().Pose),
-        //         m_IndexSubsystem.RunSpindexer()
-        //     )
-        // );
-=======
         joystick.povRight().whileTrue(
             Commands.parallel(
                 m_shooterSubsystem.CrackCocaineShooter(),
@@ -172,7 +139,6 @@ public class RobotContainer {
                 m_IndexSubsystem.RunSpindexer()
             )
         );
->>>>>>> origin/ColumbusCompMain
 
         joystick2.x().onTrue(m_shooterSubsystem.velocityIncrease());
         joystick2.y().onTrue(m_shooterSubsystem.velocityDecrease());
