@@ -9,6 +9,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -25,7 +26,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private Supplier<Pose2d> m_poseSupplier;
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
-  private final double TARGET_RPS = 51;
+  private final double TARGET_RPS = 53;
   public Translation2d blueHubPosition = new Translation2d(4.625, 4.025);
   public Translation2d redHubPosition = new Translation2d(11.913, 4.025);
 
@@ -37,7 +38,10 @@ public class ShooterSubsystem extends SubsystemBase {
   private static Translation2d shooterFieldPosition(Pose2d pose) {
     return pose.getTranslation().plus(kShooterOffset.rotateBy(pose.getRotation()));
   }
+  private boolean running = false;
+  private boolean unJamRunning = false;
   private double m_targetRPS = TARGET_RPS;
+  private boolean m_reachedSpeed = false;
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
   m_poseSupplier = poseSupplier;
   TalonFXConfiguration config = new TalonFXConfiguration();
@@ -104,13 +108,20 @@ public class ShooterSubsystem extends SubsystemBase {
     speed =  distanceMeters*KP + 20
     ;
   }
-
+  
   public boolean atSpeed() {
     return getShooterVelocity() >= .98 * m_targetRPS;
+  }
+
+  /** Latching speed flag: becomes true once up to speed, stays true until the shooter is stopped. */
+  public boolean reachedSpeed() {
+    if (atSpeed()) m_reachedSpeed = true;
+    return m_reachedSpeed;
   }
   public Command JustShoot() {
     return run(
         () -> {
+            running = true;
             setShooterVelocity(m_targetRPS);
         }).finallyDo(interrupted->endMove());
       }
@@ -126,12 +137,13 @@ public class ShooterSubsystem extends SubsystemBase {
         () -> {
             setShooterVelocity(m_targetRPS);
         },
-        () -> setShooterVelocity(0)).withTimeout(7.0);
+        () -> setShooterVelocity(0)).withTimeout(9.0);
       }
-  public Command ReverseShooter() {
+  public Command unJamShooter() {
     return run(
         () -> {
-            setShooterVelocity(-70);
+            unJamRunning = true;
+            setShooterVelocity(100);
         }).finallyDo(interrupted->endMove());
       }
 
@@ -181,6 +193,23 @@ public class ShooterSubsystem extends SubsystemBase {
             ? blueHubPosition : redHubPosition;
         double distance = m_poseSupplier.get().getTranslation().getDistance(hub);
       SmartDashboard.putNumber("DistanceToHub", distance);
+    double velocity = getShooterVelocity();
+    SmartDashboard.putNumber("ShooterVelocity", velocity);
+    SmartDashboard.putBoolean("ShooterAtSpeed", atSpeed());
+    SmartDashboard.putBoolean("ShooterReachedSpeed", m_reachedSpeed);
+    SignalLogger.writeDouble("Shooter/VelocityRPS", velocity, "rotations per second");
+    SignalLogger.writeDouble("Shooter/TargetRPS", m_targetRPS, "rotations per second");
+    SignalLogger.writeBoolean("Shooter/AtSpeed", atSpeed());
+    SignalLogger.writeBoolean("Shooter/ReachedSpeed", m_reachedSpeed);
+    if(running == true) {
+
+    }
+    else if(unJamRunning == true) {
+
+    }
+    else {
+      setShooterVelocity(20);
+    }
   }
 
   @Override
@@ -188,6 +217,9 @@ public class ShooterSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run during simulation
   }
   public void endMove() {
+    m_reachedSpeed = false;
+    unJamRunning = false;
+    running = false;
     stop();
   }
 }

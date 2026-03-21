@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.SignalLogger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,7 +18,7 @@ public class IndexSubsystem extends SubsystemBase {
   TalonFX Indexer = new TalonFX(17);
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
 
-  private final double TARGET_RPS = -85;
+  private final double TARGET_RPS = -40;
   private double m_targetRPS = TARGET_RPS;
   private ShooterSubsystem m_shooter;
   public IndexSubsystem(ShooterSubsystem shooter) {
@@ -65,13 +66,13 @@ public class IndexSubsystem extends SubsystemBase {
   public Command AutoRunSpindexer() {
     return runEnd(
         () -> {
-          if(m_shooter.atSpeed())
+          if(m_shooter.reachedSpeed())
             setIndexerVelocity(m_targetRPS);
           else {
             setIndexerVelocity(0);
           }
         },
-        () -> setIndexerVelocity(0)).withTimeout(7);
+        () -> setIndexerVelocity(0)).withTimeout(9.0);
   }
    
   public void setIndexerVelocity(double targetRPS){
@@ -106,8 +107,10 @@ public class IndexSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
-    SmartDashboard.putNumber("SpindexerVelocity", Indexer.getVelocity().getValueAsDouble());
+    double velocity = Indexer.getVelocity().getValueAsDouble();
+    SmartDashboard.putNumber("SpindexerVelocity", velocity);
+    SignalLogger.writeDouble("Indexer/VelocityRPS", velocity, "rotations per second");
+    SignalLogger.writeDouble("Indexer/TargetRPS", m_targetRPS, "rotations per second");
   }
 
   @Override

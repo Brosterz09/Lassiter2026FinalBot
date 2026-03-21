@@ -18,6 +18,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.SignalLogger;
 
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -28,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionVoltage = new PositionVoltage(0);
   private final MotionMagicVoltage m_motionMagicArm = new MotionMagicVoltage(0);
-  private final double ARM_DOWN_POSITION = 7.3;
+  private final double ARM_DOWN_POSITION = 6.7;
   private final double ARM_UP_POSITION = 0;
 
   private final TalonFXConfiguration m_armConfig;
@@ -197,7 +198,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("IntakeVelocity", IntakeMotor.getVelocity().getValueAsDouble());
+    double intakeVelocity = IntakeMotor.getVelocity().getValueAsDouble();
+    double armPosition = IntakeArmMotor.getPosition().getValueAsDouble();
+    SmartDashboard.putNumber("IntakeVelocity", intakeVelocity);
+    SmartDashboard.putNumber("IntakeArmPosition", armPosition);
+    SignalLogger.writeDouble("Intake/RollerVelocityRPS", intakeVelocity, "rotations per second");
+    SignalLogger.writeDouble("Intake/RollerTargetRPS", targetSpeed, "rotations per second");
+    SignalLogger.writeDouble("Intake/ArmPositionRotations", armPosition, "rotations");
     // This method will be called once per scheduler run
   }
 
