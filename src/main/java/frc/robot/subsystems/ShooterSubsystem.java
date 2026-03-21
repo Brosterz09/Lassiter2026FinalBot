@@ -38,6 +38,8 @@ public class ShooterSubsystem extends SubsystemBase {
   private static Translation2d shooterFieldPosition(Pose2d pose) {
     return pose.getTranslation().plus(kShooterOffset.rotateBy(pose.getRotation()));
   }
+  private boolean running = false;
+  private boolean unJamRunning = false;
   private double m_targetRPS = TARGET_RPS;
   private boolean m_reachedSpeed = false;
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
@@ -119,6 +121,7 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command JustShoot() {
     return run(
         () -> {
+            running = true;
             setShooterVelocity(m_targetRPS);
         }).finallyDo(interrupted->endMove());
       }
@@ -139,7 +142,8 @@ public class ShooterSubsystem extends SubsystemBase {
   public Command unJamShooter() {
     return run(
         () -> {
-            setShooterVelocity(-100);
+            unJamRunning = true;
+            setShooterVelocity(100);
         }).finallyDo(interrupted->endMove());
       }
 
@@ -197,6 +201,15 @@ public class ShooterSubsystem extends SubsystemBase {
     SignalLogger.writeDouble("Shooter/TargetRPS", m_targetRPS, "rotations per second");
     SignalLogger.writeBoolean("Shooter/AtSpeed", atSpeed());
     SignalLogger.writeBoolean("Shooter/ReachedSpeed", m_reachedSpeed);
+    if(running == true) {
+
+    }
+    else if(unJamRunning == true) {
+
+    }
+    else {
+      setShooterVelocity(20);
+    }
   }
 
   @Override
@@ -205,6 +218,8 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   public void endMove() {
     m_reachedSpeed = false;
+    unJamRunning = false;
+    running = false;
     stop();
   }
 }
