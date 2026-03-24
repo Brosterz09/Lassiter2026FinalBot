@@ -139,7 +139,6 @@ public class IntakeSubsystem extends SubsystemBase {
     return run(
       () -> {
         setIntakeVelocity(-targetSpeed);
-        System.out.println(IntakeArmMotor.getVelocity());
       }
     ).finallyDo(interrupted -> stopIntake());
   }
@@ -167,9 +166,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoRunIntake() {
     return runEnd(
-        () -> setIntakeVelocity(60),
+        () -> setIntakeVelocity(-targetSpeed),
         () -> endIntakeMove()
-        ).withTimeout(5);
+        ).withTimeout(9);
       }
 
   public Command AutoBringIntakeUP() {
@@ -181,7 +180,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoLowerIntakeDOWN() {
     return runEnd(
-        () -> IntakeArmMotor.set(.2),
+        () -> IntakeArmMotor.set(.25),
         () -> endLeverMove()
         ).withTimeout(.3);
       }

@@ -67,12 +67,12 @@ public class IndexSubsystem extends SubsystemBase {
     return runEnd(
         () -> {
           if(m_shooter.atSpeed())
-            setIndexerVelocity(m_targetRPS);
+            setIndexerVelocity(m_targetRPS*.7);
           else {
             setIndexerVelocity(0);
           }
         },
-        () -> setIndexerVelocity(0)).withTimeout(11.0);
+        () -> setIndexerVelocity(0)).withTimeout(9.0);
   }
    
   public void setIndexerVelocity(double targetRPS){
