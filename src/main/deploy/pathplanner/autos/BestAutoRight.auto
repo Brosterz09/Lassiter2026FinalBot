@@ -11,7 +11,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "BackShots"
+                  "name": "Spindex"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
                 }
               },
               {
@@ -28,24 +34,18 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "Spindex"
+                  "pathName": "BestAutoPathRight"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "Intake"
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "MoveToCenterLeftFULL"
           }
         },
         {
@@ -70,7 +70,7 @@
       ]
     }
   },
-  "resetOdom": false,
+  "resetOdom": true,
   "folder": null,
   "choreoAuto": false
 }
