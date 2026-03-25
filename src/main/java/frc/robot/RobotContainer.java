@@ -56,9 +56,11 @@ public class RobotContainer {
 
     public RobotContainer() {
         NamedCommands.registerCommand("Shoot", m_shooterSubsystem.AutoJustShoot());
+        NamedCommands.registerCommand("ShootForever", m_shooterSubsystem.AutoJustShootForever());
         NamedCommands.registerCommand("TrigIntake", m_IntakeSubsystem.RunIntake());
         NamedCommands.registerCommand("BackShots", m_shooterSubsystem.BackShots());
         NamedCommands.registerCommand("Spindex", m_IndexSubsystem.AutoRunSpindexer());
+        NamedCommands.registerCommand("SpindexForever", m_IndexSubsystem.AutoRunSpindexerForever());
         NamedCommands.registerCommand("Intake", m_IntakeSubsystem.AutoRunIntake());
         NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
         NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
@@ -180,19 +182,19 @@ public class RobotContainer {
 
         // Reset pose from vision on select (back) button press.
         // Tries limelight-front first, falls back to limelight-back, no-ops if no targets.
-    //     joystick.back().onTrue(Commands.runOnce(() -> {
-    //         if (LimelightHelpers.getTV("limelight-front")) {
-    //             Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
-    //             drivetrain.resetPose(visionPose);
-    //             System.out.println("Pose reset from front camera: " + visionPose);
-    //         } else if (LimelightHelpers.getTV("limelight-back")) {
-    //             Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
-    //             drivetrain.resetPose(visionPose);
-    //             System.out.println("Pose reset from back camera: " + visionPose);
-    //         } else {
-    //             System.out.println("WARNING: No vision targets seen, pose not reset");
-    //         }
-    //     }, drivetrain));
+        joystick.back().onTrue(Commands.runOnce(() -> {
+            if (LimelightHelpers.getTV("limelight-front")) {
+                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-front");
+                drivetrain.resetPose(visionPose);
+                System.out.println("Pose reset from front camera: " + visionPose);
+            } else if (LimelightHelpers.getTV("limelight-back")) {
+                Pose2d visionPose = LimelightHelpers.getBotPose2d_wpiBlue("limelight-back");
+                drivetrain.resetPose(visionPose);
+                System.out.println("Pose reset from back camera: " + visionPose);
+            } else {
+                System.out.println("WARNING: No vision targets seen, pose not reset");
+            }
+        }, drivetrain));
 
         drivetrain.registerTelemetry(logger::telemeterize);
     }

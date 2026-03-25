@@ -141,6 +141,16 @@ public class ShooterSubsystem extends SubsystemBase {
         },
         () -> endMove()).withTimeout(5.5);
       }
+
+  public Command AutoJustShootForever() {
+    return runEnd(
+        () -> {
+            autoRunning = true;
+            setShooterVelocity(m_targetRPS);
+        },
+        () -> endMove()).withTimeout(20);
+      }
+
   public Command unJamShooter() {
     return run(
         () -> {

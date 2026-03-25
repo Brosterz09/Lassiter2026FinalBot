@@ -49,13 +49,13 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Spindex"
+                  "name": "SpindexForever"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot"
+                  "name": "ShootForever"
                 }
               }
             ]

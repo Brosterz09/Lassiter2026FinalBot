@@ -33,8 +33,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final double ARM_UP_POSITION = 0;
 
   private final TalonFXConfiguration m_armConfig;
-  public boolean Intaking = false;
-  public boolean ReverseIntaking = false;
+  public boolean IntakeArming = false;
   public double targetSpeed = 70;
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
@@ -100,14 +99,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void stopIntake(){
       IntakeMotor.setControl(new com.ctre.phoenix6.controls.NeutralOut());
-      IntakeArmMotor.set(0)
-      ;
+      IntakeArmMotor.set(0);
+      IntakeArming = false;
     }
 
     public Command SetIntakeArmDown() {
     return run(
       () -> {
         IntakeArmMotor.setControl(m_motionMagicArm.withPosition(ARM_DOWN_POSITION).withSlot(1));
+        IntakeArming = true;
       }).finallyDo(Interrupted -> stopIntake());
     }
         // () -> {
@@ -119,6 +119,7 @@ public class IntakeSubsystem extends SubsystemBase {
     return run(
       () -> {
         IntakeArmMotor.setControl(m_motionMagicArm.withPosition(ARM_UP_POSITION).withSlot(0));
+        IntakeArming = true;
       }).finallyDo(Interrupted -> stopIntake());
     }
 
@@ -140,8 +141,10 @@ public class IntakeSubsystem extends SubsystemBase {
   public Command RunIntake() {
     return run(
       () -> {
-        setIntakeVelocity(-targetSpeed);
-        IntakeArmMotor.set(.1);
+        if(!IntakeArming) {
+          setIntakeVelocity(-targetSpeed);
+          IntakeArmMotor.set(.1);
+        }
       }
     ).finallyDo(interrupted -> stopIntake());
   }
