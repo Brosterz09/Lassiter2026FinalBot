@@ -24,12 +24,12 @@ public class IndexSubsystem extends SubsystemBase {
   public IndexSubsystem(ShooterSubsystem shooter) {
     m_shooter = shooter;
     TalonFXConfiguration config = new TalonFXConfiguration();
-      config.Slot0.kP = 0.098;
+      config.Slot0.kP = 0.2;
       config.Slot0.kI = 0;
       config.Slot0.kD = 0;
       config.Slot0.kV = 0.098;
       config.Slot0.kS = 0.0;
-      config.CurrentLimits.StatorCurrentLimit = 35;
+      config.CurrentLimits.StatorCurrentLimit = 27;
       config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -72,7 +72,7 @@ public class IndexSubsystem extends SubsystemBase {
             setIndexerVelocity(0);
           }
         },
-        () -> setIndexerVelocity(0)).withTimeout(9.0);
+        () -> setIndexerVelocity(0)).withTimeout(5.5);
   }
    
   public void setIndexerVelocity(double targetRPS){

@@ -139,7 +139,7 @@ public class ShooterSubsystem extends SubsystemBase {
             autoRunning = true;
             setShooterVelocity(m_targetRPS);
         },
-        () -> endMove()).withTimeout(9.0);
+        () -> endMove()).withTimeout(5.5);
       }
   public Command unJamShooter() {
     return run(

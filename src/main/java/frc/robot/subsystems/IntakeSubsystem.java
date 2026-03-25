@@ -39,12 +39,12 @@ public class IntakeSubsystem extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
       TalonFXConfiguration config = new TalonFXConfiguration();
-      config.Slot0.kP = 0.098;
+      config.Slot0.kP = 0.3;
       config.Slot0.kI = 0;
       config.Slot0.kD = 0;
       config.Slot0.kV = 0.098;
       config.Slot0.kS = 0.0;
-      config.CurrentLimits.StatorCurrentLimit = 30;
+      config.CurrentLimits.StatorCurrentLimit = 55;
       config.CurrentLimits.StatorCurrentLimitEnable = true;
       config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -65,7 +65,7 @@ public class IntakeSubsystem extends SubsystemBase {
       m_armConfig.Slot1.kV = .1;
       m_armConfig.Slot1.kS = 0;
       m_armConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
-      m_armConfig.CurrentLimits.StatorCurrentLimit = 80;
+      m_armConfig.CurrentLimits.StatorCurrentLimit = 60;
       m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       m_armConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -100,6 +100,8 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public void stopIntake(){
       IntakeMotor.setControl(new com.ctre.phoenix6.controls.NeutralOut());
+      IntakeArmMotor.set(0)
+      ;
     }
 
     public Command SetIntakeArmDown() {
@@ -139,6 +141,7 @@ public class IntakeSubsystem extends SubsystemBase {
     return run(
       () -> {
         setIntakeVelocity(-targetSpeed);
+        IntakeArmMotor.set(.1);
       }
     ).finallyDo(interrupted -> stopIntake());
   }
@@ -166,7 +169,10 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoRunIntake() {
     return runEnd(
-        () -> setIntakeVelocity(-targetSpeed),
+        () -> {
+          setIntakeVelocity(-targetSpeed);
+          IntakeArmMotor.set(.1);
+        },
         () -> endIntakeMove()
         ).withTimeout(9);
       }
