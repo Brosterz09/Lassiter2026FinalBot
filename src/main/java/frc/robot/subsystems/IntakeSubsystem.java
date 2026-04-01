@@ -35,6 +35,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final TalonFXConfiguration m_armConfig;
   public boolean IntakeArming = false;
   public double targetSpeed = 70;
+  
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
       TalonFXConfiguration config = new TalonFXConfiguration();
@@ -143,7 +144,7 @@ public class IntakeSubsystem extends SubsystemBase {
       () -> {
         if(!IntakeArming) {
           setIntakeVelocity(-targetSpeed);
-          IntakeArmMotor.set(.1);
+          IntakeArmMotor.set(-.08);
         }
       }
     ).finallyDo(interrupted -> stopIntake());
@@ -208,6 +209,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     double intakeVelocity = IntakeMotor.getVelocity().getValueAsDouble();
     double armPosition = IntakeArmMotor.getPosition().getValueAsDouble();
+    SmartDashboard.putBoolean("ArmUp", armPosition > 6);
     SmartDashboard.putNumber("IntakeVelocity", intakeVelocity);
     SmartDashboard.putNumber("IntakeArmPosition", armPosition);
     SignalLogger.writeDouble("Intake/RollerVelocityRPS", intakeVelocity, "rotations per second");
@@ -218,8 +220,14 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
+    double intakeVelocity = IntakeMotor.getVelocity().getValueAsDouble();
+    double armPosition = IntakeArmMotor.getPosition().getValueAsDouble();
+    SmartDashboard.putBoolean("ArmUp", armPosition > 6);
+    SmartDashboard.putNumber("IntakeVelocity", intakeVelocity);
+    SmartDashboard.putNumber("IntakeArmPosition", armPosition);
     // This method will be called once per scheduler run during simulation
   }
+
   public void endLeverMove(){
     IntakeArmMotor.set(0);
   }

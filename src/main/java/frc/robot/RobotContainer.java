@@ -1,4 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
+// Copyright (c) FIRFT and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
@@ -32,7 +32,6 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class RobotContainer {
     public double MaxSpeed = .8 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     public double MaxAngularRate = RotationsPerSecond.of(.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
     /* Setting up bindings for necessary control of the swerve drive platform */
     public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -51,7 +50,7 @@ public class RobotContainer {
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
     public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem(m_shooterSubsystem);
     public final HangSubsystem m_HangSubsystem = new HangSubsystem();
-    
+    public static final Rotation2d k180deg = new Rotation2d();
 
 
     public RobotContainer() {
@@ -178,7 +177,7 @@ public class RobotContainer {
         // seedFieldCentric() is NOT used here because it resets the pose heading to 0°
         // and ignores the alliance perspective, causing controls to flip or pose to be wrong
         // depending on which direction the robot faces when pressed.
-        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric(k180deg)));
 
         // Reset pose from vision on select (back) button press.
         // Tries limelight-front first, falls back to limelight-back, no-ops if no targets.
@@ -204,9 +203,10 @@ public class RobotContainer {
             // Briefly lock wheels in X-pattern so steer motors reach their initial
             // path heading before the drive motors spin up, preventing the auto-start lurch.
             drivetrain.applyRequest(() -> brake).withTimeout(0.25),
-            AutoBuilder.buildAuto("BestAutoRight"));
+            AutoBuilder.buildAuto("BestAutoLeftNoShoot"));
             //AutoBuilder.buildAuto("TestAuto"));/
             //AutoBuilder.buildAuto("CenterAutoLEFT"));
+            //AutoBuilder.buildAuto("DepotAuto"));
     }
 }
 
