@@ -28,6 +28,7 @@ import frc.robot.subsystems.HangSubsystem;
 import frc.robot.subsystems.IndexSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 
 public class RobotContainer {
     public double MaxSpeed = .8 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -50,6 +51,7 @@ public class RobotContainer {
     public final IntakeSubsystem m_IntakeSubsystem = new IntakeSubsystem();
     public final IndexSubsystem m_IndexSubsystem = new IndexSubsystem(m_shooterSubsystem);
     public final HangSubsystem m_HangSubsystem = new HangSubsystem();
+    public final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
     public static final Rotation2d k180deg = new Rotation2d();
 
 
