@@ -26,7 +26,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private Supplier<Pose2d> m_poseSupplier;
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
-  private final double TARGET_RPS = 76;
+  private final double TARGET_RPS = 60;
   public Translation2d blueHubPosition = new Translation2d(4.625, 4.025);
   public Translation2d redHubPosition = new Translation2d(11.913, 4.025);
 
