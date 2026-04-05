@@ -366,23 +366,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         //     }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
         // }
     private void updateVisionFromCamera(String cameraName) {
-        boolean valid = LimelightHelpers.getTV(cameraName);
+        // Provide current robot heading to Limelight so MegaTag2 can resolve the
+        // 180-degree pose ambiguity that MegaTag1 is susceptible to.
+        LimelightHelpers.SetRobotOrientation(
+            cameraName,
+            getState().Pose.getRotation().getDegrees(),
+            0, 0, 0, 0, 0
+        );
 
-        if (valid) {
-            Pose2d botpose = LimelightHelpers.getBotPose2d_wpiBlue(cameraName);
-            double timestamp = LimelightHelpers.getLatency_Pipeline(cameraName) / 1000.0
-                            + LimelightHelpers.getLatency_Capture(cameraName) / 1000.0;
-            double latencyAdjustedTimestamp = Timer.getFPGATimestamp() - timestamp;
+        LimelightHelpers.PoseEstimate poseEstimate =
+            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
 
-            int tagCount = LimelightHelpers.getTargetCount(cameraName);
+        if (poseEstimate == null || poseEstimate.tagCount == 0) return;
 
-        if (tagCount >= 2) {
-            addVisionMeasurement(botpose, latencyAdjustedTimestamp,
-                VecBuilder.fill(0.5, 0.5, 0.7));
-            } else if (tagCount == 1) {
-            addVisionMeasurement(botpose, latencyAdjustedTimestamp,
-                VecBuilder.fill(1.0, 1.0, 1.5));
-            }
+        // Trust vision for XY position only; rotation std dev of 9999 means the
+        // gyro remains authoritative for heading.
+        if (poseEstimate.tagCount >= 2) {
+            addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds,
+                VecBuilder.fill(0.5, 0.5, 9999));
+        } else {
+            addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds,
+                VecBuilder.fill(1.0, 1.0, 9999));
         }
     }
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
