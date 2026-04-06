@@ -27,12 +27,11 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-     public void robotPeriodic() {
+    public void robotPeriodic() {
         m_timeAndJoystickReplay.update();
         CommandScheduler.getInstance().run();
 
         double matchTime = DriverStation.getMatchTime();
-        SmartDashboard.putNumber("Match Time", matchTime);
 
         String robotMode;
         if (DriverStation.isAutonomous()) {
@@ -44,24 +43,44 @@ public class Robot extends TimedRobot {
         } else {
             robotMode = "Unknown";
         }
-        SmartDashboard.putString("Robot Mode", robotMode);
 
-        updatePeriodTimings(matchTime);
+        // ── COMP layout keys ──────────────────────────────────────────────
+        SmartDashboard.putNumber("Match Time", matchTime);
+        SmartDashboard.putString("Robot Mode", robotMode);
+        updatePeriodTimings(matchTime, "", "Hub Status", "Time Until Next Change (s)", "Time Until Our Period (s)", "Our Period Active");
+
+        // ── PRACTICE layout keys ──────────────────────────────────────────
+        SmartDashboard.putNumber("PRACTICE_MatchTime", matchTime);
+        SmartDashboard.putString("PRACTICE_RobotMode", robotMode);
+        updatePeriodTimings(matchTime, "PRACTICE_", "PRACTICE_HubStatus", "PRACTICE_TimeUntilNextChange", "PRACTICE_TimeUntilOurPeriod", "PRACTICE_OurPeriodActive");
     }
 
-    private void updatePeriodTimings(double matchTime) {
+    /**
+     * Shared logic for computing and publishing hub period timing.
+     * Called once for the comp layout (no prefix) and once for the practice layout (PRACTICE_ prefix).
+     */
+    private void updatePeriodTimings(
+        double matchTime,
+        String prefix,
+        String hubStatusKey,
+        String nextChangeKey,
+        String ourPeriodKey,
+        String ourPeriodActiveKey
+    ) {
         if (!DriverStation.isTeleopEnabled()) {
-            SmartDashboard.putString("Hub Status", "N/A");
-            SmartDashboard.putNumber("Time Until Next Change (s)", -1);
-            SmartDashboard.putNumber("Time Until Our Period (s)", -1);
+            SmartDashboard.putString(hubStatusKey, "N/A");
+            SmartDashboard.putNumber(nextChangeKey, -1);
+            SmartDashboard.putNumber(ourPeriodKey, -1);
+            SmartDashboard.putBoolean(ourPeriodActiveKey, false);
             return;
         }
 
         String gameData = DriverStation.getGameSpecificMessage();
         if (gameData.isEmpty()) {
-            SmartDashboard.putString("Hub Status", "Waiting for game data...");
-            SmartDashboard.putNumber("Time Until Next Change (s)", -1);
-            SmartDashboard.putNumber("Time Until Our Period (s)", -1);
+            SmartDashboard.putString(hubStatusKey, "Waiting for game data...");
+            SmartDashboard.putNumber(nextChangeKey, -1);
+            SmartDashboard.putNumber(ourPeriodKey, -1);
+            SmartDashboard.putBoolean(ourPeriodActiveKey, false);
             return;
         }
 
@@ -74,7 +93,6 @@ public class Robot extends TimedRobot {
         // Shift 1 active alliance = the one that WON auto
         boolean weAreActiveInShift1 = isRed ? !redInactiveFirst : redInactiveFirst;
 
-        
         // Shift boundaries — matchTime counts DOWN from 135
         // >130 = transition, 130-105 = Shift 1, 105-80 = Shift 2,
         //  80-55 = Shift 3, 55-30 = Shift 4, <30 = End Game
@@ -108,9 +126,10 @@ public class Robot extends TimedRobot {
         // If we're inactive, next change = our period starts (shifts alternate)
         double timeUntilOurPeriod = weAreActiveNow ? 0 : timeUntilNextChange;
 
-        SmartDashboard.putString("Hub Status", weAreActiveNow ? "OUR PERIOD" : "Their Period");
-        SmartDashboard.putNumber("Time Until Next Change (s)", Math.max(0, timeUntilNextChange));
-        SmartDashboard.putNumber("Time Until Our Period (s)", Math.max(0, timeUntilOurPeriod));
+        SmartDashboard.putString(hubStatusKey, weAreActiveNow ? "OUR PERIOD" : "Their Period");
+        SmartDashboard.putNumber(nextChangeKey, Math.max(0, timeUntilNextChange));
+        SmartDashboard.putNumber(ourPeriodKey, Math.max(0, timeUntilOurPeriod));
+        SmartDashboard.putBoolean(ourPeriodActiveKey, weAreActiveNow);
     }
 
     @Override
