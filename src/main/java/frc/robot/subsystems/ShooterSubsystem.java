@@ -111,7 +111,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   
   public boolean atSpeed() {
-    return getShooterVelocity() >= .98 * m_targetRPS;
+    return getShooterVelocity() >= .99 * m_targetRPS;
   }
 
   /** Latching speed flag: becomes true once up to speed, stays true until the shooter is stopped. */

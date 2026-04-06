@@ -34,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final TalonFXConfiguration m_armConfig;
   public boolean IntakeArming = false;
-  public double targetSpeed = 90;
+  public double targetSpeed = 70;
   
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
@@ -50,9 +50,9 @@ public class IntakeSubsystem extends SubsystemBase {
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       IntakeMotor.getConfigurator().apply(config);
       m_armConfig = new TalonFXConfiguration();
-      m_armConfig.Slot0.kP = .4;
-      m_armConfig.Slot0.kI = 1;
-      m_armConfig.Slot0.kD = 0;
+      m_armConfig.Slot0.kP = .5;
+      m_armConfig.Slot0.kI = 1.2;
+      m_armConfig.Slot0.kD = 0.2;
       m_armConfig.Slot0.kV = .4;
       m_armConfig.Slot0.kS = 0;
       m_armConfig.Slot0.kG = 0;
@@ -62,7 +62,7 @@ public class IntakeSubsystem extends SubsystemBase {
       m_armConfig.Slot1.kP = .1;
       m_armConfig.Slot1.kI = 0;
       m_armConfig.Slot1.kD = 0;
-      m_armConfig.Slot1.kV = .2;
+      m_armConfig.Slot1.kV = .1;
       m_armConfig.Slot1.kS = 0;
       m_armConfig.CurrentLimits.StatorCurrentLimit = 60;
       m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;

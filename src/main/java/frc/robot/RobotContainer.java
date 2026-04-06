@@ -76,8 +76,8 @@ public class RobotContainer {
         LimelightHelpers.setCameraPose_RobotSpace(
     "limelight-back",
     -0.321, -0.15, 0.4699,
-    0, 0, 180.0
-        );
+    0, 0, 180
+    );
         drivetrain.configureAutoBuilder();
     
         configureBindings();
@@ -180,7 +180,8 @@ public class RobotContainer {
         // and ignores the alliance perspective, causing controls to flip or pose to be wrong
         // depending on which direction the robot faces when pressed.
         joystick.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric(k180deg)));
-
+        // joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        
         // Reset pose from vision on select (back) button press.
         // Tries limelight-front first, falls back to limelight-back, no-ops if no targets.
         joystick.back().onTrue(Commands.runOnce(() -> {
