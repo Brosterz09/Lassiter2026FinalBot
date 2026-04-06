@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.HootAutoReplay;
 
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,6 +34,9 @@ public class Robot extends TimedRobot {
 
         double matchTime = DriverStation.getMatchTime();
 
+        // Same voltage source the Driver Station uses
+        double voltage = RobotController.getBatteryVoltage();
+
         String robotMode;
         if (DriverStation.isAutonomous()) {
             robotMode = "Autonomous";
@@ -44,24 +48,39 @@ public class Robot extends TimedRobot {
             robotMode = "Unknown";
         }
 
+        // ── Voltage ───────────────────────────────────────────────────────
+        SmartDashboard.putNumber("Battery Voltage", voltage);
+
+        // ── Auto result (only available once FMS sends game data in teleop) ──
+        String gameData = DriverStation.getGameSpecificMessage();
+        if (!gameData.isEmpty()) {
+            boolean redInactiveFirst = gameData.charAt(0) == 'R';
+            var alliance = DriverStation.getAlliance();
+            boolean isRed = alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red;
+            boolean weWonAuto = isRed ? !redInactiveFirst : redInactiveFirst;
+            SmartDashboard.putBoolean("Won Auto", weWonAuto);
+            SmartDashboard.putString("Auto Result", weWonAuto ? "WON AUTO" : "LOST AUTO");
+        } else {
+            SmartDashboard.putString("Auto Result", "Waiting...");
+        }
+
         // ── COMP layout keys ──────────────────────────────────────────────
         SmartDashboard.putNumber("Match Time", matchTime);
         SmartDashboard.putString("Robot Mode", robotMode);
-        updatePeriodTimings(matchTime, "", "Hub Status", "Time Until Next Change (s)", "Time Until Our Period (s)", "Our Period Active");
+        updatePeriodTimings(matchTime, "Hub Status", "Time Until Next Change (s)", "Time Until Our Period (s)", "Our Period Active");
 
         // ── PRACTICE layout keys ──────────────────────────────────────────
         SmartDashboard.putNumber("PRACTICE_MatchTime", matchTime);
         SmartDashboard.putString("PRACTICE_RobotMode", robotMode);
-        updatePeriodTimings(matchTime, "PRACTICE_", "PRACTICE_HubStatus", "PRACTICE_TimeUntilNextChange", "PRACTICE_TimeUntilOurPeriod", "PRACTICE_OurPeriodActive");
+        updatePeriodTimings(matchTime, "PRACTICE_HubStatus", "PRACTICE_TimeUntilNextChange", "PRACTICE_TimeUntilOurPeriod", "PRACTICE_OurPeriodActive");
     }
 
     /**
      * Shared logic for computing and publishing hub period timing.
-     * Called once for the comp layout (no prefix) and once for the practice layout (PRACTICE_ prefix).
+     * Called once for the comp layout and once for the practice layout.
      */
     private void updatePeriodTimings(
         double matchTime,
-        String prefix,
         String hubStatusKey,
         String nextChangeKey,
         String ourPeriodKey,

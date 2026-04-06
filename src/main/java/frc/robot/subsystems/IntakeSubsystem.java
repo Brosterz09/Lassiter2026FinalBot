@@ -34,7 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private final TalonFXConfiguration m_armConfig;
   public boolean IntakeArming = false;
-  public double targetSpeed = 70;
+  public double targetSpeed = 50;
   
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
@@ -207,7 +207,7 @@ public class IntakeSubsystem extends SubsystemBase {
     double intakeVelocity = IntakeMotor.getVelocity().getValueAsDouble();
     double armPosition = IntakeArmMotor.getPosition().getValueAsDouble();
     SmartDashboard.putBoolean("ArmUp", armPosition > 6);
-    SmartDashboard.putNumber("IntakeVelocity", intakeVelocity);
+    SmartDashboard.putNumber("IntakeVelocity", (int) intakeVelocity);
     SmartDashboard.putNumber("IntakeArmPosition", armPosition);
     SignalLogger.writeDouble("Intake/RollerVelocityRPS", intakeVelocity, "rotations per second");
     SignalLogger.writeDouble("Intake/RollerTargetRPS", targetSpeed, "rotations per second");

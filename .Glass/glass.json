@@ -12,6 +12,7 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
+      "/SmartDashboard/LED Mode": "String Chooser",
       "/SmartDashboard/Module 0": "Mechanism2d",
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
@@ -27,10 +28,10 @@
       "/Pose": {
         "builtin": "",
         "height": 8.051901817321777,
-        "image": "C:\\Users\\lassi\\Downloads\\2026-field (1).png",
         "width": 17.54825210571289,
         "window": {
-          "name": "2026"
+          "name": "2026",
+          "visible": true
         }
       }
     }
@@ -77,7 +78,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 332
+          "height": 0
         }
       ]
     }

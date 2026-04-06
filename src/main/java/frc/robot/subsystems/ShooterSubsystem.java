@@ -26,7 +26,9 @@ public class ShooterSubsystem extends SubsystemBase {
   private Supplier<Pose2d> m_poseSupplier;
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
-  private final double TARGET_RPS = 60;
+  //SHOOTER SPEED IS BELOW FAHHHHHHHHHH
+  private final double TARGET_RPS = 70;
+  //Shooter speed is ABOVE FAHHHHHHHHHH
   public Translation2d blueHubPosition = new Translation2d(4.625, 4.025);
   public Translation2d redHubPosition = new Translation2d(11.913, 4.025);
 
@@ -173,13 +175,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
   public Command velocityIncrease() {
     return runOnce(
-      () -> m_targetRPS *= 1.1
+      () -> m_targetRPS += 1
     );
   }
 
   public Command velocityDecrease() {
     return runOnce(
-      () -> m_targetRPS /= 1.1
+      () -> m_targetRPS -= 1
     );
   }
 
@@ -206,10 +208,10 @@ public class ShooterSubsystem extends SubsystemBase {
         double distance = m_poseSupplier.get().getTranslation().getDistance(hub);
       SmartDashboard.putNumber("DistanceToHub", distance);
     double velocity = getShooterVelocity();
-    SmartDashboard.putNumber("ShooterVelocity", velocity);
+    SmartDashboard.putNumber("ShooterVelocity", (int)velocity);
     SmartDashboard.putBoolean("ShooterAtSpeed", atSpeed());
     SmartDashboard.putBoolean("ShooterReachedSpeed", m_reachedSpeed);
-    SignalLogger.writeDouble("Shooter/VelocityRPS", velocity, "rotations per second");
+    SignalLogger.writeDouble("Shooter/VelocityRPS", (int)velocity, "rotations per second");
     SignalLogger.writeDouble("Shooter/TargetRPS", m_targetRPS, "rotations per second");
     SignalLogger.writeBoolean("Shooter/AtSpeed", atSpeed());
     SignalLogger.writeBoolean("Shooter/ReachedSpeed", m_reachedSpeed);
@@ -223,7 +225,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     }
     else {
-      setShooterVelocity(20);
+      setShooterVelocity(-10);
     }
   }
 

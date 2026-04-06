@@ -119,7 +119,7 @@ public class IndexSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     double velocity = Indexer.getVelocity().getValueAsDouble();
-    SmartDashboard.putNumber("SpindexerVelocity", velocity);
+    SmartDashboard.putNumber("SpindexerVelocity", (int)velocity);
     SignalLogger.writeDouble("Indexer/VelocityRPS", velocity, "rotations per second");
     SignalLogger.writeDouble("Indexer/TargetRPS", m_targetRPS, "rotations per second");
   }

@@ -44,7 +44,7 @@ public class RobotContainer {
 
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-    private final PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
+    public final PowerDistribution pdh = new PowerDistribution(1, ModuleType.kRev);
     private final CommandXboxController joystick = new CommandXboxController(0);
     private final CommandXboxController joystick2 = new CommandXboxController(1);
     public final ShooterSubsystem m_shooterSubsystem = new ShooterSubsystem(() -> drivetrain.getState().Pose);
