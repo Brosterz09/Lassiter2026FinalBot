@@ -29,12 +29,12 @@ public class IntakeSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionVoltage = new PositionVoltage(0);
   private final MotionMagicVoltage m_motionMagicArm = new MotionMagicVoltage(0);
-  private final double ARM_DOWN_POSITION = 6.7;
+  private final double ARM_DOWN_POSITION = -6.5;
   private final double ARM_UP_POSITION = 0;
 
   private final TalonFXConfiguration m_armConfig;
   public boolean IntakeArming = false;
-  public double targetSpeed = 70;
+  public double targetSpeed = 90;
   
   /** Creates a new ExampleSubsystem. */
   public IntakeSubsystem() {
@@ -50,21 +50,20 @@ public class IntakeSubsystem extends SubsystemBase {
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       IntakeMotor.getConfigurator().apply(config);
       m_armConfig = new TalonFXConfiguration();
-      m_armConfig.Slot0.kP = 8.0;
-      m_armConfig.Slot0.kI = 0;
+      m_armConfig.Slot0.kP = .4;
+      m_armConfig.Slot0.kI = 1;
       m_armConfig.Slot0.kD = 0;
-      m_armConfig.Slot0.kV = 8.6;
-      m_armConfig.Slot0.kS = 0.5;
-      m_armConfig.Slot0.kG = -6.0;
+      m_armConfig.Slot0.kV = .4;
+      m_armConfig.Slot0.kS = 0;
+      m_armConfig.Slot0.kG = 0;
       m_armConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
-      m_armConfig.MotionMagic.MotionMagicCruiseVelocity = 60;
-      m_armConfig.MotionMagic.MotionMagicAcceleration = 80;
-      m_armConfig.Slot1.kP = .15;
+      m_armConfig.MotionMagic.MotionMagicCruiseVelocity = 12;
+      m_armConfig.MotionMagic.MotionMagicAcceleration = 15;
+      m_armConfig.Slot1.kP = .1;
       m_armConfig.Slot1.kI = 0;
-      m_armConfig.Slot1.kD = 0.1;
-      m_armConfig.Slot1.kV = .1;
+      m_armConfig.Slot1.kD = 0;
+      m_armConfig.Slot1.kV = .2;
       m_armConfig.Slot1.kS = 0;
-      m_armConfig.Slot1.GravityType = GravityTypeValue.Elevator_Static;
       m_armConfig.CurrentLimits.StatorCurrentLimit = 60;
       m_armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       m_armConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
@@ -144,7 +143,6 @@ public class IntakeSubsystem extends SubsystemBase {
       () -> {
         if(!IntakeArming) {
           setIntakeVelocity(-targetSpeed);
-          IntakeArmMotor.set(-.08);
         }
       }
     ).finallyDo(interrupted -> stopIntake());
@@ -175,7 +173,6 @@ public class IntakeSubsystem extends SubsystemBase {
     return runEnd(
         () -> {
           setIntakeVelocity(-targetSpeed);
-          IntakeArmMotor.set(.1);
         },
         () -> endIntakeMove()
         ).withTimeout(9);
@@ -190,7 +187,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command AutoLowerIntakeDOWN() {
     return runEnd(
-        () -> IntakeArmMotor.set(.25),
+        () -> IntakeArmMotor.set(-.25),
         () -> endLeverMove()
         ).withTimeout(.3);
       }

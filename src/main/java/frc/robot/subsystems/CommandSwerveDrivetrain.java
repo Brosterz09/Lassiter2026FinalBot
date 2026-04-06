@@ -383,24 +383,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         //     }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
         // }
     private void updateVisionFromCamera(String cameraName) {
-        LimelightHelpers.PoseEstimate mt2 =
+        // Provide current robot heading to Limelight so MegaTag2 can resolve the
+        // 180-degree pose ambiguity that MegaTag1 is susceptible to.
+        LimelightHelpers.SetRobotOrientation(
+            cameraName,
+            getState().Pose.getRotation().getDegrees(),
+            0, 0, 0, 0, 0
+        );
+
+        LimelightHelpers.PoseEstimate poseEstimate =
             LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
-        if (mt2 == null || mt2.tagCount == 0) return;
 
-        // Reject measurements during fast rotation (MegaTag2 is unreliable)
-        if (Math.abs(getState().Speeds.omegaRadiansPerSecond) > Math.toRadians(360)) return;
+        if (poseEstimate == null || poseEstimate.tagCount == 0) return;
 
-        // Reject poses outside field boundaries
-        if (mt2.pose.getX() < 0 || mt2.pose.getX() > 16.5
-            || mt2.pose.getY() < 0 || mt2.pose.getY() > 8.2) return;
-
-        // Set theta std dev to effectively infinite -- never correct heading from vision
-        if (mt2.tagCount >= 2) {
-            addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
+        // Trust vision for XY position only; rotation std dev of 9999 means the
+        // gyro remains authoritative for heading.
+        if (poseEstimate.tagCount >= 2) {
+            addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds,
                 VecBuilder.fill(0.5, 0.5, 9999));
         } else {
-            addVisionMeasurement(mt2.pose, mt2.timestampSeconds,
-                VecBuilder.fill(1.0, 1.0, 99999));
+            addVisionMeasurement(poseEstimate.pose, poseEstimate.timestampSeconds,
+                VecBuilder.fill(1.0, 1.0, 9999));
         }
     }
 
