@@ -51,9 +51,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
-   
-    
-
     /* Swerve requests to apply during SysId characterization */
     private final SwerveRequest.SysIdSwerveTranslation m_translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
@@ -65,7 +62,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             null,        // Use default ramp rate (1 V/s)
             Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
             null,        // Use default timeout (10 s)
-            // Log state with SignalLogger class
             state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())
         ),
         new SysIdRoutine.Mechanism(
@@ -81,7 +77,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             null,        // Use default ramp rate (1 V/s)
             Volts.of(7), // Use dynamic voltage of 7 V
             null,        // Use default timeout (10 s)
-            // Log state with SignalLogger class
             state -> SignalLogger.writeString("SysIdSteer_State", state.toString())
         ),
         new SysIdRoutine.Mechanism(
@@ -94,23 +89,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /*
      * SysId routine for characterizing rotation.
      * This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
-     * See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
      */
     private final SysIdRoutine m_sysIdRoutineRotation = new SysIdRoutine(
         new SysIdRoutine.Config(
-            /* This is in radians per second², but SysId only supports "volts per second" */
             Volts.of(Math.PI / 6).per(Second),
-            /* This is in radians per second, but SysId only supports "volts" */
             Volts.of(Math.PI),
-            null, // Use default timeout (10 s)
-            // Log state with SignalLogger class
+            null,
             state -> SignalLogger.writeString("SysIdRotation_State", state.toString())
         ),
         new SysIdRoutine.Mechanism(
             output -> {
-                /* output is actually radians per second, but SysId only supports "volts" */
                 setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
-                /* also log the requested output for SysId */
                 SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
             },
             null,
@@ -121,16 +110,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants   Drivetrain-wide constants for the swerve drive
-     * @param modules               Constants for each specific module
-     */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules
@@ -141,19 +120,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants     Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency The frequency to run the odometry loop. If
-     *                                unspecified or set to 0 Hz, this is 250 Hz on
-     *                                CAN FD, and 100 Hz on CAN 2.0.
-     * @param modules                 Constants for each specific module
-     */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
@@ -165,25 +131,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
-     * getters in the classes.
-     *
-     * @param drivetrainConstants       Drivetrain-wide constants for the swerve drive
-     * @param odometryUpdateFrequency   The frequency to run the odometry loop. If
-     *                                  unspecified or set to 0 Hz, this is 250 Hz on
-     *                                  CAN FD, and 100 Hz on CAN 2.0.
-     * @param odometryStandardDeviation The standard deviation for odometry calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param visionStandardDeviation   The standard deviation for vision calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
-     *                                  and radians
-     * @param modules                   Constants for each specific module
-     */
     public CommandSwerveDrivetrain(
         SwerveDrivetrainConstants drivetrainConstants,
         double odometryUpdateFrequency,
@@ -196,76 +143,51 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
     }
+
     private final SwerveRequest.ApplyRobotSpeeds m_autoRequest = new SwerveRequest.ApplyRobotSpeeds();
 
     public void configureAutoBuilder() {
-    try {
-        System.out.println("Loading PathPlanner config...");
-        var config = RobotConfig.fromGUISettings();
-        System.out.println("Config loaded successfully");
+        try {
+            System.out.println("Loading PathPlanner config...");
+            var config = RobotConfig.fromGUISettings();
+            System.out.println("Config loaded successfully");
 
-        AutoBuilder.configure(
-            () -> getState().Pose,
-            this::resetPose,
-            () -> getState().Speeds,
-            (speeds, feedforwards) -> setControl(
-                m_autoRequest.withSpeeds(speeds)
-                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
-            ),
-            new PPHolonomicDriveController(
-                new PIDConstants(10.0, 0.0, 0.0),
-                new PIDConstants(3.0, 0.0, 0)
-            ),
-            config,
-            () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-            this
-        );
-        System.out.println("AutoBuilder configured successfully");
-    }  catch (Exception ex) {
-    System.out.println("!!!!!!! AUTOBUILDER ERROR: " + ex.getMessage());
-    ex.printStackTrace();
-}
-}
-    /**
-     * Returns a command that applies the specified control request to this swerve drivetrain.
-     *
-     * @param request Function returning the request to apply
-     * @return Command to run
-     */
+            AutoBuilder.configure(
+                () -> getState().Pose,
+                this::resetPose,
+                () -> getState().Speeds,
+                (speeds, feedforwards) -> setControl(
+                    m_autoRequest.withSpeeds(speeds)
+                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
+                ),
+                new PPHolonomicDriveController(
+                    new PIDConstants(10.0, 0.0, 0.0),
+                    new PIDConstants(3.0, 0.0, 0)
+                ),
+                config,
+                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                this
+            );
+            System.out.println("AutoBuilder configured successfully");
+        } catch (Exception ex) {
+            System.out.println("!!!!!!! AUTOBUILDER ERROR: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+
     public Command applyRequest(Supplier<SwerveRequest> request) {
         return run(() -> this.setControl(request.get()));
     }
 
-    /**
-     * Runs the SysId Quasistatic test in the given direction for the routine
-     * specified by {@link #m_sysIdRoutineToApply}.
-     *
-     * @param direction Direction of the SysId Quasistatic test
-     * @return Command to run
-     */
     public Command sysIdQuasistatic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.quasistatic(direction);
     }
 
-    /**
-     * Runs the SysId Dynamic test in the given direction for the routine
-     * specified by {@link #m_sysIdRoutineToApply}.
-     *
-     * @param direction Direction of the SysId Dynamic test
-     * @return Command to run
-     */
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
 
-    /**
-     * Re-applies the alliance-correct operator perspective forward direction.
-     * Use this for the "heading reset" button instead of seedFieldCentric().
-     * seedFieldCentric() resets the pose heading to 0° and overrides the alliance
-     * perspective, causing controls to be reversed or the pose to be wrong depending
-     * on which direction the robot faces when the button is pressed.
-     */
     public void resetAlliancePerspective() {
         DriverStation.getAlliance().ifPresent(allianceColor -> {
             setOperatorPerspectiveForward(
@@ -278,13 +200,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        /*
-         * Periodically try to apply the operator perspective.
-         * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
-         * This allows us to correct the perspective in case the robot code restarts mid-match.
-         * Otherwise, only check and apply the operator perspective if the DS is disabled.
-         * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
-         */
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
@@ -296,8 +211,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
 
-        // Feed gyro heading and yaw rate to Limelights for MegaTag2
-        double yaw = getState().Pose.getRotation().getDegrees();
+        // Use raw Pigeon2 gyro heading instead of fused pose rotation to avoid
+        // a feedback loop where a bad vision estimate corrupts the heading sent
+        // back to the Limelight, making the next MT2 estimate worse.
+        double yaw = getPigeon2().getRotation2d().getDegrees();
         double yawRateDegPerSec = Math.toDegrees(getState().Speeds.omegaRadiansPerSecond);
         LimelightHelpers.SetRobotOrientation("limelight-front", yaw, yawRateDegPerSec, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-back", yaw, yawRateDegPerSec, 0, 0, 0, 0);
@@ -309,43 +226,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();
 
-        /* Run simulation at a faster rate so PID gains behave more reasonably */
         m_simNotifier = new Notifier(() -> {
             final double currentTime = Utils.getCurrentTimeSeconds();
             double deltaTime = currentTime - m_lastSimTime;
             m_lastSimTime = currentTime;
 
-            /* use the measured time delta, get battery voltage from WPILib */
             updateSimState(deltaTime, RobotController.getBatteryVoltage());
         });
         m_simNotifier.startPeriodic(kSimLoopPeriod);
     }
 
-    /**
-     * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
-     * while still accounting for measurement noise.
-     *
-     * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-     * @param timestampSeconds The timestamp of the vision measurement in seconds.
-     */
     @Override
     public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
-    /**
-     * Adds a vision measurement to the Kalman Filter. This will correct the odometry pose estimate
-     * while still accounting for measurement noise.
-     * <p>
-     * Note that the vision measurement standard deviations passed into this method
-     * will continue to apply to future measurements until a subsequent call to
-     * {@link #setVisionMeasurementStdDevs(Matrix)} or this method.
-     *
-     * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
-     * @param timestampSeconds The timestamp of the vision measurement in seconds.
-     * @param visionMeasurementStdDevs Standard deviations of the vision pose measurement
-     *     in the form [x, y, theta]ᵀ, with units in meters and radians.
-     */
     @Override
     public void addVisionMeasurement(
         Pose2d visionRobotPoseMeters,
@@ -355,44 +250,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
     }
 
-    /**
-     * Return the pose at a given timestamp, if the buffer is not empty.
-     *
-     * @param timestampSeconds The timestamp of the pose in seconds.
-     * @return The pose at the given timestamp (or Optional.empty() if the buffer is empty).
-     */
     @Override
     public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
-        // public Command CenterBot(SwerveRequest.FieldCentric drive, double maxAngularRate) {
-        //     return run(() -> {             
-        //             LimelightHelpers.setPriorityTagID("limelight-front", 9);
-        //             double Tx = LimelightHelpers.getTX("limelight-front");
-        //             System.out.println(LimelightHelpers.getFiducialID("limelight-front"));
-        //             double rotateSpeed = 0.45;
-        //             if (Tx > 0) {
-        //                 rotateSpeed = -rotateSpeed;
-        //             }
-        //             else if (Tx == 0) {
-        //                 rotateSpeed = 0;
-        //             }
-        //             this.setControl(drive.withRotationalRate(rotateSpeed * maxAngularRate));
-
-        //     }).until(() -> Math.abs(LimelightHelpers.getTX("limelight-front")) <= 2);
-        // }
     private void updateVisionFromCamera(String cameraName) {
-        // Provide current robot heading to Limelight so MegaTag2 can resolve the
-        // 180-degree pose ambiguity that MegaTag1 is susceptible to.
-        LimelightHelpers.SetRobotOrientation(
-            cameraName,
-            getState().Pose.getRotation().getDegrees(),
-            0, 0, 0, 0, 0
-        );
+        // Use alliance-aware pose estimate so coordinates match the field origin
+        // expected by the pose estimator for the current alliance.
+        boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
 
-        LimelightHelpers.PoseEstimate poseEstimate =
-            LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
+        LimelightHelpers.PoseEstimate poseEstimate = isRed
+            ? LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(cameraName)
+            : LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
 
         if (poseEstimate == null || poseEstimate.tagCount == 0) return;
 
@@ -415,21 +285,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * at match start because the gyro was zeroed when the robot powered on in its
      * forward-facing position, then the robot was staged (potentially at a different
      * heading). MegaTag2 would reuse that boot-time gyro heading; MegaTag1 does not.
-     *
-     * Both cameras are checked; the one seeing more tags is preferred (fewer tags
-     * increases SolvePNP ambiguity). Returns true if the pose was successfully seeded.
      */
     public boolean seedPoseFromVision() {
         LimelightHelpers.PoseEstimate bestEstimate = null;
         String bestCamera = null;
+        boolean isRed = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red;
 
         for (String camera : new String[]{"limelight-front", "limelight-back"}) {
-            LimelightHelpers.PoseEstimate mt1 =
-                LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
+            LimelightHelpers.PoseEstimate mt1 = isRed
+                ? LimelightHelpers.getBotPoseEstimate_wpiRed(camera)
+                : LimelightHelpers.getBotPoseEstimate_wpiBlue(camera);
+
             if (mt1 == null || mt1.tagCount == 0) continue;
             if (mt1.pose.getX() < 0 || mt1.pose.getX() > 16.5
                 || mt1.pose.getY() < 0 || mt1.pose.getY() > 8.2) continue;
-            // Prefer the camera with more visible tags (less ambiguous heading solve)
             if (bestEstimate == null || mt1.tagCount > bestEstimate.tagCount) {
                 bestEstimate = mt1;
                 bestCamera = camera;
@@ -445,51 +314,47 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Command aimAtHub(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
-    Translation2d blueHub = new Translation2d(4.625, 4.025);
-    Translation2d redHub = new Translation2d(11.913, 4.025);
+        Translation2d blueHub = new Translation2d(4.625, 4.025);
+        Translation2d redHub = new Translation2d(11.913, 4.025);
 
-    return run(() -> {
-        Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-            ? blueHub : redHub;
-        Pose2d currentPose = getState().Pose;
-        Translation2d toHub = hub.minus(currentPose.getTranslation());
-        Rotation2d targetAngle = toHub.getAngle();
-        double error = targetAngle.minus(currentPose.getRotation()).getRadians();
-        double kP = 6;
-        double rotationSpeed = error * kP;
+        return run(() -> {
+            Translation2d hub = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? blueHub : redHub;
+            Pose2d currentPose = getState().Pose;
+            Translation2d toHub = hub.minus(currentPose.getTranslation());
+            Rotation2d targetAngle = toHub.getAngle();
+            double error = targetAngle.minus(currentPose.getRotation()).getRadians();
+            double kP = 6;
+            double rotationSpeed = error * kP;
 
-        rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
+            rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
 
-        setControl(drive
-            .withVelocityX(vx.get())
-            .withVelocityY(vy.get())
-            .withRotationalRate(rotationSpeed)
-        );
-    });
-}
+            setControl(drive
+                .withVelocityX(vx.get())
+                .withVelocityY(vy.get())
+                .withRotationalRate(rotationSpeed)
+            );
+        });
+    }
+
     public Command aimAtAllianceSide(SwerveRequest.FieldCentric drive, Supplier<Double> vx, Supplier<Double> vy, double maxAngularRate) {
-    return run(() -> {
-        // Blue faces their wall at 180°, Red faces their wall at 0°
-        Rotation2d targetAngle = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
-            ? Rotation2d.fromDegrees(180)
-            : Rotation2d.fromDegrees(0);
+        return run(() -> {
+            Rotation2d targetAngle = DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue
+                ? Rotation2d.fromDegrees(180)
+                : Rotation2d.fromDegrees(0);
 
-        Pose2d currentPose = getState().Pose;
-        double error = targetAngle.minus(currentPose.getRotation()).getRadians();
+            Pose2d currentPose = getState().Pose;
+            double error = targetAngle.minus(currentPose.getRotation()).getRadians();
 
-        double kP = 6;
-        double rotationSpeed = error * kP;
-        rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
+            double kP = 6;
+            double rotationSpeed = error * kP;
+            rotationSpeed = Math.max(-maxAngularRate, Math.min(maxAngularRate, rotationSpeed));
 
-        setControl(drive
-            .withVelocityX(vx.get())
-            .withVelocityY(vy.get())
-            .withRotationalRate(rotationSpeed)
-        );
-    });
+            setControl(drive
+                .withVelocityX(vx.get())
+                .withVelocityY(vy.get())
+                .withRotationalRate(rotationSpeed)
+            );
+        });
+    }
 }
-}
-
-
-    
-    

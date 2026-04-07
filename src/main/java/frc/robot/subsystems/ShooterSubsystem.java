@@ -27,7 +27,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
   //SHOOTER SPEED IS BELOW FAHHHHHHHHHH
-  private final double TARGET_RPS = 85;
+  private final double TARGET_RPS = 88.0;
   //Shooter speed is ABOVE FAHHHHHHHHHH
   public Translation2d blueHubPosition = new Translation2d(4.625, 4.025);
   public Translation2d redHubPosition = new Translation2d(11.913, 4.025);
@@ -48,10 +48,10 @@ public class ShooterSubsystem extends SubsystemBase {
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
   m_poseSupplier = poseSupplier;
   TalonFXConfiguration config = new TalonFXConfiguration();
-  config.Slot0.kP = 0.4;
-  config.Slot0.kI = 0.5;
+  config.Slot0.kP = 0.5;
+  config.Slot0.kI = 0.0;
   config.Slot0.kD = 0.01;
-  config.Slot0.kV = 0.12;
+  config.Slot0.kV = 0.15;
   config.Slot0.kS = 0.0;
   config.CurrentLimits.StatorCurrentLimit = 100;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -113,7 +113,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
   
   public boolean atSpeed() {
-    return getShooterVelocity() >= .99 * m_targetRPS;
+    return getShooterVelocity() >= .985 * m_targetRPS;
   }
 
   /** Latching speed flag: becomes true once up to speed, stays true until the shooter is stopped. */
@@ -225,7 +225,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
     }
     else {
-      setShooterVelocity(-10);
+      // setShooterVelocity(-10);
     }
   }
 
