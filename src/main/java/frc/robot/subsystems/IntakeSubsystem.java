@@ -143,6 +143,7 @@ public class IntakeSubsystem extends SubsystemBase {
       () -> {
         if(!IntakeArming) {
           setIntakeVelocity(-targetSpeed);
+          IntakeArmMotor.set(-.1);
         }
       }
     ).finallyDo(interrupted -> stopIntake());
@@ -206,9 +207,11 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     double intakeVelocity = IntakeMotor.getVelocity().getValueAsDouble();
     double armPosition = IntakeArmMotor.getPosition().getValueAsDouble();
-    SmartDashboard.putBoolean("ArmUp", armPosition > 6);
+    SmartDashboard.putBoolean("ArmUp", armPosition > -.5);
     SmartDashboard.putNumber("IntakeVelocity", (int) intakeVelocity);
     SmartDashboard.putNumber("IntakeArmPosition", armPosition);
+    boolean intakeAtSpeed = Math.abs(intakeVelocity) >= Math.abs(targetSpeed) * 0.9;
+    SmartDashboard.putBoolean("IntakeAtSpeed", intakeAtSpeed);
     SignalLogger.writeDouble("Intake/RollerVelocityRPS", intakeVelocity, "rotations per second");
     SignalLogger.writeDouble("Intake/RollerTargetRPS", targetSpeed, "rotations per second");
     SignalLogger.writeDouble("Intake/ArmPositionRotations", armPosition, "rotations");
