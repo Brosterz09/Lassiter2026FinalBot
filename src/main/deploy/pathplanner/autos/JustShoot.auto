@@ -5,12 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Center"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [

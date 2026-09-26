@@ -302,8 +302,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         LimelightHelpers.SetRobotOrientation("limelight-front", yaw, yawRateDegPerSec, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-back", yaw, yawRateDegPerSec, 0, 0, 0, 0);
 
-        updateVisionFromCamera("limelight-front");
-        updateVisionFromCamera("limelight-back");
+        // updateVisionFromCamera("limelight-front");
+        // updateVisionFromCamera("limelight-back");
     }
 
     private void startSimThread() {

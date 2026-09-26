@@ -27,7 +27,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocity = new VelocityVoltage(0);
   //private final double TARGET_RPS = 56.0;
   //SHOOTER SPEED IS BELOW FAHHHHHHHHHH
-  private final double TARGET_RPS = 85;
+  private final double TARGET_RPS = 89.5;
   //Shooter speed is ABOVE FAHHHHHHHHHH
   public Translation2d blueHubPosition = new Translation2d(4.625, 4.025);
   public Translation2d redHubPosition = new Translation2d(11.913, 4.025);
@@ -48,12 +48,19 @@ public class ShooterSubsystem extends SubsystemBase {
   public ShooterSubsystem(Supplier<Pose2d> poseSupplier) {
   m_poseSupplier = poseSupplier;
   TalonFXConfiguration config = new TalonFXConfiguration();
-  config.Slot0.kP = 0.4;
-  config.Slot0.kI = 0.5;
-  config.Slot0.kD = 0.01;
-  config.Slot0.kV = 0.12;
+  config.Slot0.kP = 0.67;
+  config.Slot0.kI = 0.0;
+  config.Slot0.kD = 0.0;
+  config.Slot0.kV = 0.1195;
   config.Slot0.kS = 0.0;
-  config.CurrentLimits.StatorCurrentLimit = 100;
+  config.Slot0.kA = 6;
+  // config.Slot0.kP = 1.2;
+  // config.Slot0.kI = 0.0;
+  // config.Slot0.kD = 0.00;
+  // config.Slot0.kV = 0.14;
+  // config.Slot0.kS = 0.01;
+  // config.Slot0.kA = .0;
+  config.CurrentLimits.StatorCurrentLimit = 160;
   config.CurrentLimits.StatorCurrentLimitEnable = true;
   config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
   config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
@@ -141,7 +148,16 @@ public class ShooterSubsystem extends SubsystemBase {
             autoRunning = true;
             setShooterVelocity(m_targetRPS);
         },
-        () -> endMove()).withTimeout(5.5);
+        () -> endMove()).withTimeout(7.5);
+      }
+
+      public Command LongAutoJustShoot() {
+    return runEnd(
+        () -> {
+            autoRunning = true;
+            setShooterVelocity(m_targetRPS);
+        },
+        () -> endMove()).withTimeout(15);
       }
 
   public Command AutoJustShootForever() {
@@ -215,19 +231,16 @@ public class ShooterSubsystem extends SubsystemBase {
     SignalLogger.writeDouble("Shooter/TargetRPS", m_targetRPS, "rotations per second");
     SignalLogger.writeBoolean("Shooter/AtSpeed", atSpeed());
     SignalLogger.writeBoolean("Shooter/ReachedSpeed", m_reachedSpeed);
-    if(running == true) {
-
-    }
-    else if(unJamRunning == true) {
-
-    }
-    else if (autoRunning == true) {
-
-    }
-    else {
-      setShooterVelocity(-10);
-    }
   }
+    // if(running == true) {
+
+    // }
+    // else if(unJamRunning == true) {
+
+    // }
+    // else if (autoRunning == true
+    
+
 
   @Override
   public void simulationPeriodic() {

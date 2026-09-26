@@ -5,28 +5,28 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Center"
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "SpindexForever"
+                  "name": "LongSpindex"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ShootForever"
+                  "name": "LongShoot"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Gyattrizz"
           }
         }
       ]

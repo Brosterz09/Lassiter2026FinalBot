@@ -68,6 +68,8 @@ public class RobotContainer {
         NamedCommands.registerCommand("MoveIntakeDOWN", m_IntakeSubsystem.AutoLowerIntakeDOWN());
         NamedCommands.registerCommand("MoveIntakeUP", m_IntakeSubsystem.AutoBringIntakeUP());
         NamedCommands.registerCommand("Hang", m_HangSubsystem.AutoHangBot());
+        NamedCommands.registerCommand("LongShoot", m_shooterSubsystem.LongAutoJustShoot());
+        NamedCommands.registerCommand("LongSpindex", m_IndexSubsystem.LongAutoRunSpindexer());
 
         LimelightHelpers.setCameraPose_RobotSpace(
             "limelight-front",
@@ -98,7 +100,7 @@ public class RobotContainer {
             )
         );
 
-        joystick.leftTrigger().whileTrue(m_IntakeSubsystem.RunIntake());
+        joystick.leftTrigger().whileTrue(drivetrain.applyRequest(() -> brake));
         joystick.leftBumper().whileTrue(m_IntakeSubsystem.RunIntakeReverse());
         joystick.povUp().whileTrue(m_HangSubsystem.HangRobotUp());
         joystick.povDown().whileTrue(m_HangSubsystem.HangRobotDown());
@@ -186,7 +188,10 @@ public class RobotContainer {
             // Briefly lock wheels so steer motors reach their initial heading
             // before drive motors spin up, preventing the auto-start lurch.
             drivetrain.applyRequest(() -> brake).withTimeout(0.25),
-            m_autoChooser.getSelected()
-        );
+            // AutoBuilder.buildAuto("DeathAutoLeft"));
+            // AutoBuilder.buildAuto("DeathAutoRight"));
+            AutoBuilder.buildAuto("JustShoot"));
+
+
     }
 }

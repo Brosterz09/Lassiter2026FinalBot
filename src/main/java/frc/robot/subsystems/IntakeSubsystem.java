@@ -29,7 +29,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private final VelocityVoltage m_velocityIntake = new VelocityVoltage(0);
   private final PositionVoltage m_positionVoltage = new PositionVoltage(0);
   private final MotionMagicVoltage m_motionMagicArm = new MotionMagicVoltage(0);
-  private final double ARM_DOWN_POSITION = -6.5;
+  private final double ARM_DOWN_POSITION = 6.5;
   private final double ARM_UP_POSITION = 0;
 
   private final TalonFXConfiguration m_armConfig;
@@ -50,10 +50,10 @@ public class IntakeSubsystem extends SubsystemBase {
       config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
       IntakeMotor.getConfigurator().apply(config);
       m_armConfig = new TalonFXConfiguration();
-      m_armConfig.Slot0.kP = .5;
-      m_armConfig.Slot0.kI = 1.2;
+      m_armConfig.Slot0.kP = .7;
+      m_armConfig.Slot0.kI = 0;
       m_armConfig.Slot0.kD = 0.2;
-      m_armConfig.Slot0.kV = .4;
+      m_armConfig.Slot0.kV = .6;
       m_armConfig.Slot0.kS = 0;
       m_armConfig.Slot0.kG = 0;
       m_armConfig.Slot0.GravityType = GravityTypeValue.Elevator_Static;
@@ -176,7 +176,7 @@ public class IntakeSubsystem extends SubsystemBase {
           setIntakeVelocity(-targetSpeed);
         },
         () -> endIntakeMove()
-        ).withTimeout(9);
+        ).withTimeout(6);
       }
 
   public Command AutoBringIntakeUP() {
@@ -190,7 +190,7 @@ public class IntakeSubsystem extends SubsystemBase {
     return runEnd(
         () -> IntakeArmMotor.set(-.25),
         () -> endLeverMove()
-        ).withTimeout(.3);
+        ).withTimeout(1);
       }
 
   /**

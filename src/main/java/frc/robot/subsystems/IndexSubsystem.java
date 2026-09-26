@@ -72,7 +72,19 @@ public class IndexSubsystem extends SubsystemBase {
             setIndexerVelocity(0);
           }
         },
-        () -> setIndexerVelocity(0)).withTimeout(5.5);
+        () -> setIndexerVelocity(0)).withTimeout(7.5);
+      }
+
+public Command LongAutoRunSpindexer() {
+    return runEnd(
+        () -> {
+          if(m_shooter.atSpeed())
+            setIndexerVelocity(m_targetRPS);
+          else {
+            setIndexerVelocity(0);
+          }
+        },
+        () -> setIndexerVelocity(0)).withTimeout(15);
   }
   public Command AutoRunSpindexerForever() {
     return runEnd(

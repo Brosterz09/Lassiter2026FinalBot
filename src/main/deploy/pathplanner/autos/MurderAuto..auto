@@ -5,28 +5,28 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "Center"
-          }
-        },
-        {
-          "type": "parallel",
+          "type": "sequential",
           "data": {
             "commands": [
               {
                 "type": "named",
                 "data": {
-                  "name": "SpindexForever"
+                  "name": "Spindex"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "ShootForever"
+                  "name": "Shoot"
                 }
               }
             ]
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "murder.."
           }
         }
       ]
