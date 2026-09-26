@@ -24,9 +24,9 @@ public class TunerConstants {
     // The steer motor uses any SwerveModule.SteerRequestType control request with the
     // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGains = new Slot0Configs()
-        .withKP(100)
+        .withKP(90)
         .withKI(0)
-        .withKD(0.1)
+        .withKD(0.6)
         .withKS(0.1)
         .withKV(0.124)
         .withKA(0)
@@ -72,7 +72,7 @@ public class TunerConstants {
             new CurrentLimitsConfigs()
                 // Swerve azimuth does not require much torque output, so we can set a relatively low
                 // stator current limit to help avoid brownouts without impacting performance.
-                .withStatorCurrentLimit(Amps.of(28))
+                .withStatorCurrentLimit(Amps.of(30))
                 .withStatorCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(Amps.of(28))
                 .withSupplyCurrentLimitEnable(true)
